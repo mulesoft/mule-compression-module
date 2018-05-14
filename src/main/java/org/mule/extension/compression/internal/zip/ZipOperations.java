@@ -30,7 +30,7 @@ public class ZipOperations {
   /**
    * Compresses the given {@code content} using the ZIP format.
    * <p>
-   * Actual compression will occur in a lazily. This operation returns a stream and actual compression will happen
+   * Actual compression will occur in a lazy manner. This operation returns a stream and actual compression will happen
    * as the stream is consumed. Keep in mind that any errors that may rise during compression will not occur in this operation,
    * but in those which are consuming the stream returned here.
    *
@@ -46,7 +46,7 @@ public class ZipOperations {
   /**
    * Decompresses the given {@code content} which is assumed to be in ZIP format.
    * <p>
-   * Actual compression will occur in a lazily. This operation returns a stream and actual decompression will happen
+   * Actual compression will occur in a lazy manner. This operation returns a stream and actual decompression will happen
    * as the stream is consumed. Keep in mind that not all  errors that may rise during compression will occur in this operation.
    * Some might actual appear in the components that consume this stream
    *

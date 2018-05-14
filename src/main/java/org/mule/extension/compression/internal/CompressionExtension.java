@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 
 /**
- * A module which provides functionality for compressing and uncompressing files.
+ * A module which provides functionality for compressing and uncompressing data.
  *
  * @since 1.0
  */
