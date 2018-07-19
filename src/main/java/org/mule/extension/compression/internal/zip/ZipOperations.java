@@ -9,11 +9,13 @@ package org.mule.extension.compression.internal.zip;
 import static org.mule.extension.compression.api.CompressionError.INVALID_ZIP;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import org.mule.extension.compression.internal.exception.DecompressionException;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.exception.ModuleException;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,8 +41,12 @@ public class ZipOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Summary("Compresses the given content using the ZIP format")
-  public InputStream zip(@Content InputStream content) {
-    return new GZIPCompressorInputStream(content);
+  public Result<InputStream, Void> zip(@Content TypedValue<InputStream> content) {
+    return Result
+        .<InputStream, Void>builder()
+        .output(new GZIPCompressorInputStream(content.getValue()))
+        .mediaType(content.getDataType().getMediaType())
+        .build();
   }
 
   /**
@@ -56,9 +62,13 @@ public class ZipOperations {
   @MediaType(value = ANY, strict = false)
   @Throws(UnzipErrorProvider.class)
   @Summary("Decompresses the given content which is assumed to be in ZIP format")
-  public InputStream unzip(@Content InputStream content) {
+  public Result<InputStream, Void> unzip(@Content TypedValue<InputStream> content) {
     try {
-      return new GZIPInputStream(content);
+      return Result
+          .<InputStream, Void>builder()
+          .output(new GZIPInputStream(content.getValue()))
+          .mediaType(content.getDataType().getMediaType())
+          .build();
     } catch (ZipException e) {
       throw new ModuleException("The provided ZIP content is invalid: " + e.getMessage(), INVALID_ZIP, e);
     } catch (IOException e) {
