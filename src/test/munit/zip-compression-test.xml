@@ -20,11 +20,15 @@
     </flow>
 
     <munit:test name="progateMimeType">
-        <munit:validation>
+        <munit:behavior >
             <set-payload value="#[output application/json --- { message : 'a json message'}]"/>
             <set-variable variableName="originalMessage" value="#[payload]"/>
-            <flow-ref name="zip"/>
-            <flow-ref name="unzip"/>
+        </munit:behavior>
+        <munit:execution>
+            <compression:zip />
+            <compression:unzip />
+        </munit:execution>
+        <munit:validation>
             <munit-tools:assert-that expression="#[payload.^mimeType]" is="#[MunitTools::equalTo(vars.originalMessage.^mimeType)]"/>
             <munit-tools:assert-that expression="#[payload.message]" is="#[MunitTools::equalTo('a json message')]"/>
         </munit:validation>
