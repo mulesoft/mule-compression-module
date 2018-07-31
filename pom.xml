@@ -6,14 +6,14 @@
     <parent>
         <groupId>org.mule.extensions</groupId>
         <artifactId>mule-core-modules-parent</artifactId>
-        <version>1.1.0</version>
+        <version>1.1.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-compression-module</artifactId>
     <packaging>mule-extension</packaging>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
 
     <name>Compression Module</name>
     <description>A Mule module that provides functionality for managing compressed files</description>
@@ -26,15 +26,6 @@
         <munit.version>2.2.0-SNAPSHOT</munit.version>
         <mavenResourcesVersion>3.0.2</mavenResourcesVersion>
     </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.7</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 
     <build>
         <plugins>
@@ -68,7 +59,8 @@
                     <targetRuntimes>
                         <targetRuntime>MULE:4.1.1</targetRuntime>
                         <targetRuntime>MULE:4.1.2</targetRuntime>
-                        <targetRuntime>MULE:4.1.3-SNAPSHOT</targetRuntime>
+                        <targetRuntime>MULE:4.1.3</targetRuntime>
+                        <targetRuntime>MULE:4.1.4-SNAPSHOT</targetRuntime>
                     </targetRuntimes>
                 </configuration>
                 <executions>
@@ -98,6 +90,15 @@
         </plugins>
     </build>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.connectors</groupId>
+            <artifactId>mule-file-connector</artifactId>
+            <version>1.1.2</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <distributionManagement>
         <downloadUrl>http://www.mulesoft.org/display/MULE/Download</downloadUrl>

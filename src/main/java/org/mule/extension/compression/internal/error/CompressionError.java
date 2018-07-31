@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.compression.api;
+package org.mule.extension.compression.internal.error;
 
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
@@ -16,12 +16,22 @@ import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 public enum CompressionError implements ErrorTypeDefinition<CompressionError> {
 
   /**
-   * The content to be decompressed was not a valid ZIP
+   * The content to be decompressed is not a valid archive
    */
-  INVALID_ZIP,
+  INVALID_ARCHIVE,
 
   /**
-   * An error occurred while trying to decompress
+   * Error that is thrown when an archive with multiple entries is passed to the decompress operation.
    */
-  COULD_NOT_DECOMPRESS;
+  TOO_MANY_ENTRIES,
+
+  /**
+   * Error occurred while trying to decompress
+   */
+  COULD_NOT_DECOMPRESS,
+
+  /**
+   * Error occurred while trying to compress
+   */
+  COULD_NOT_COMPRESS
 }

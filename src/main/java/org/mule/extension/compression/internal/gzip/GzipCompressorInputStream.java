@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.compression.internal.zip;
+package org.mule.extension.compression.internal.gzip;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,12 +13,14 @@ import java.util.zip.CheckedInputStream;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterInputStream;
 
+import static java.util.zip.Deflater.DEFAULT_COMPRESSION;
+
 /**
  * Implements an input stream for compressing input data in the GZIP compression format.
  *
  * @since 1.0
  */
-public class GZIPCompressorInputStream extends DeflaterInputStream {
+public class GzipCompressorInputStream extends DeflaterInputStream {
 
   // GZIP header magic number.
   private final static int GZIP_MAGIC = 0x8b1f;
@@ -77,12 +79,12 @@ public class GZIPCompressorInputStream extends DeflaterInputStream {
   }
 
   /**
-   * Creates a new {@link GZIPCompressorInputStream} from an uncompressed {@link InputStream}.
+   * Creates a new {@link GzipCompressorInputStream} from an uncompressed {@link InputStream}.
    *
    * @param in The uncompressed {@link InputStream}.
    */
-  public GZIPCompressorInputStream(InputStream in) {
-    super(new CheckedInputStream(in, new CRC32()), new Deflater(Deflater.DEFAULT_COMPRESSION, true));
+  public GzipCompressorInputStream(InputStream in) {
+    super(new CheckedInputStream(in, new CRC32()), new Deflater(DEFAULT_COMPRESSION, true));
     buffer = new Buffer();
   }
 

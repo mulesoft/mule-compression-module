@@ -1,0 +1,48 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns:compression="http://www.mulesoft.org/schema/mule/compression"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+      http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+      http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd">
+
+    <munit:config name="gzip-negative.xml"/>
+
+    <munit:test name="null-gzip-to-compress" expectedErrorType="COMPRESSION:COULD_NOT_COMPRESS">
+        <munit:execution>
+            <compression:compress>
+                <compression:content>#[vars.noExists]</compression:content>
+                <compression:compressor>
+                    <compression:gzip-compressor/>
+                </compression:compressor>
+            </compression:compress>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:fail message="EXAMPLE MESSAGE"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="null-gzip-to-decompress" expectedErrorType="COMPRESSION:INVALID_ARCHIVE">
+        <munit:execution>
+            <compression:decompress>
+                <compression:compressed>#[vars.noExists]</compression:compressed>
+                <compression:decompressor>
+                    <compression:gzip-decompressor/>
+                </compression:decompressor>
+            </compression:decompress>
+        </munit:execution>
+    </munit:test>
+
+    <munit:test name="invalid-gzip-to-decompress" expectedErrorType="COMPRESSION:INVALID_ARCHIVE">
+        <munit:execution>
+            <compression:decompress>
+                <compression:compressed>#['INVALID_CONTENT']</compression:compressed>
+                <compression:decompressor>
+                    <compression:gzip-decompressor/>
+                </compression:decompressor>
+            </compression:decompress>
+        </munit:execution>
+    </munit:test>
+</mule>
