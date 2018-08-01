@@ -83,7 +83,7 @@ public class ZipStrategyTestCase {
   @Test
   public void decompressTooManyEntries() {
     expected.expect(TooManyEntriesException.class);
-    expected.expectMessage("Expected a single entry archive but got multiple");
+    expected.expectMessage("Expected a single entry archive but got [2] entries [dir/in-dir.txt, file.txt]");
 
     InputStream testInput = currentThread().getContextClassLoader().getResourceAsStream(ZIP_TEST_ARCHIVE_NAME);
     decompressor.decompress(new TypedValue<>(testInput, TEXT_STRING));
@@ -107,14 +107,6 @@ public class ZipStrategyTestCase {
     InputStream decompressed = decompressor.decompress(asTextTypedValue(compressed.getOutput()));
 
     assertThat(IOUtils.toString(decompressed), is(TEST_DATA));
-  }
-
-  @Test
-  public void doArchiveRoundTrip() {
-    // TODO
-    //    Result<InputStream, Void> compressed = compressor.compress(asTextTypedValue(new ByteArrayInputStream(TEST_DATA.getBytes())));
-    //    Result<InputStream, EntryAttributes> decompressed = decompressor.decompress(asTextTypedValue(compressed.getOutput()));
-    //    assertThat(IOUtils.toString(decompressed.getOutput()), is(TEST_DATA));
   }
 
   @Test

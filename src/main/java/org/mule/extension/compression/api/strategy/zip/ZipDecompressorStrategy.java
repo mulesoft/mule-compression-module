@@ -16,7 +16,11 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
@@ -43,8 +47,12 @@ public class ZipDecompressorStrategy implements DecompressorStrategy {
         throw new InvalidArchiveException();
       }
       InputStream result = entryExtractor.extractEntry(zip);
-      if (zip.getNextEntry() != null) {
-        throw new TooManyEntriesException();
+      List<String> followingEntries = getFollowingEntries(zip);
+      if (!followingEntries.isEmpty()) {
+        List<String> allEntries = new ArrayList<>();
+        allEntries.add(entry.getName());
+        allEntries.addAll(followingEntries);
+        throw new TooManyEntriesException(allEntries);
       }
       return result;
     } catch (ModuleException e) {
@@ -54,5 +62,15 @@ public class ZipDecompressorStrategy implements DecompressorStrategy {
     } catch (Exception e) {
       throw new DecompressionException(e);
     }
+  }
+
+  private List<String> getFollowingEntries(ZipInputStream zip) throws IOException {
+    List<String> names = new ArrayList<>();
+    ZipEntry nextEntry = zip.getNextEntry();
+    while (nextEntry != null) {
+      names.add(nextEntry.getName());
+      nextEntry = zip.getNextEntry();
+    }
+    return names;
   }
 }

@@ -9,6 +9,10 @@ package org.mule.extension.compression.internal.error.exception;
 import org.mule.extension.compression.internal.error.CompressionError;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
+import java.util.List;
+
+import static java.lang.String.format;
+import static java.lang.String.join;
 import static org.mule.extension.compression.internal.error.CompressionError.TOO_MANY_ENTRIES;
 
 /**
@@ -21,8 +25,13 @@ import static org.mule.extension.compression.internal.error.CompressionError.TOO
  */
 public class TooManyEntriesException extends ModuleException {
 
-  public TooManyEntriesException() {
-    super("Expected a single entry archive but got multiple, use the extract operation for multiple entry archives",
-          TOO_MANY_ENTRIES);
+  public TooManyEntriesException(List<String> entryNames) {
+    super(buildMessage(entryNames), TOO_MANY_ENTRIES);
+  }
+
+  private static String buildMessage(List<String> entryNames) {
+    String names = join(", ", entryNames);
+    return format("Expected a single entry archive but got [%s] entries [%s],"
+        + " use the extract operation for multiple entry archives", entryNames.size(), names);
   }
 }
