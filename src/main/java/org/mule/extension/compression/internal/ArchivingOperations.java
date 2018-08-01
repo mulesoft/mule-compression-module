@@ -13,6 +13,7 @@ import org.mule.extension.compression.internal.error.exception.NullArchiveExcept
 import org.mule.extension.compression.internal.error.providers.ArchiveErrorProvider;
 import org.mule.extension.compression.internal.error.providers.ExtractErrorProvider;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Content;
@@ -21,6 +22,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -60,7 +62,7 @@ public class ArchivingOperations {
   @MediaType(value = ANY, strict = false)
   @Summary("Compresses a set of entries into a new file in the specified archive format")
   @Throws(ArchiveErrorProvider.class)
-  public Result<InputStream, Void> archive(@Content Map<String, InputStream> entries,
+  public Result<InputStream, Void> archive(@Content Map<String, TypedValue<InputStream>> entries,
                                            @Expression(NOT_SUPPORTED) ArchiverStrategy archiver) {
     if (entries == null) {
       throw new CompressionException("the entries parameter is null");

@@ -59,7 +59,7 @@ public class ZipStrategyTestCase {
 
   @Test
   public void archive() {
-    Map<String, InputStream> testEntries = getTestEntries();
+    Map<String, TypedValue<InputStream>> testEntries = getTestEntries();
     Result<InputStream, Void> compress = archiver.archive(testEntries);
     byte[] zipBytes = toByteArray(compress.getOutput());
 
@@ -112,7 +112,6 @@ public class ZipStrategyTestCase {
     // TODO
     //    Result<InputStream, Void> compressed = compressor.compress(asTextTypedValue(new ByteArrayInputStream(TEST_DATA.getBytes())));
     //    Result<InputStream, EntryAttributes> decompressed = decompressor.decompress(asTextTypedValue(compressed.getOutput()));
-
     //    assertThat(IOUtils.toString(decompressed.getOutput()), is(TEST_DATA));
   }
 
@@ -125,11 +124,11 @@ public class ZipStrategyTestCase {
         .decompress(new TypedValue<>(new ByteArrayInputStream("INVALID CONTENT - NOT A ZIP FILE".getBytes()), INPUT_STREAM));
   }
 
-  private Map<String, InputStream> getTestEntries() {
-    return ImmutableMap.<String, InputStream>builder()
-        .put("data1", new ByteArrayInputStream(TEST_DATA.getBytes()))
-        .put("data2", new ByteArrayInputStream(TEST_DATA.getBytes()))
-        .put("data3", new ByteArrayInputStream(TEST_DATA.getBytes()))
+  private Map<String, TypedValue<InputStream>> getTestEntries() {
+    return ImmutableMap.<String, TypedValue<InputStream>>builder()
+        .put("data1", asTextTypedValue(new ByteArrayInputStream(TEST_DATA.getBytes())))
+        .put("data2", asTextTypedValue(new ByteArrayInputStream(TEST_DATA.getBytes())))
+        .put("data3", asTextTypedValue(new ByteArrayInputStream(TEST_DATA.getBytes())))
         .build();
   }
 }

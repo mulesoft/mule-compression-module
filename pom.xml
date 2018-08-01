@@ -20,6 +20,7 @@
 
     <properties>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
+        <file.connector.version>1.1.2</file.connector.version>
         <munit.input.directory>src/test/munit</munit.input.directory>
         <munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
         <munit.extensions.maven.plugin.version>1.0.0-SNAPSHOT</munit.extensions.maven.plugin.version>
@@ -61,6 +62,7 @@
                         <targetRuntime>MULE:4.1.2</targetRuntime>
                         <targetRuntime>MULE:4.1.3</targetRuntime>
                         <targetRuntime>MULE:4.1.4-SNAPSHOT</targetRuntime>
+                        <targetRuntime>MULE:4.2.0-SNAPSHOT</targetRuntime>
                     </targetRuntimes>
                 </configuration>
                 <executions>
@@ -94,7 +96,7 @@
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-file-connector</artifactId>
-            <version>1.1.2</version>
+            <version>${file.connector.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>

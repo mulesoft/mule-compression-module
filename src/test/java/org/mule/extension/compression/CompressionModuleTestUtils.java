@@ -15,6 +15,8 @@ import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
 
 public class CompressionModuleTestUtils {
 
+  private CompressionModuleTestUtils() {}
+
   public static final int DATA_SIZE = 1024;
   public static final String TEST_DATA = randomAlphabetic(DATA_SIZE);
 

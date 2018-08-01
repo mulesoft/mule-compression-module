@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 /**
+ * Provides the capability to extract the entries of a compressed archive in some format.
  *
  * @since 2.0
  */

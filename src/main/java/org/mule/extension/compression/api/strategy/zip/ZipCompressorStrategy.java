@@ -20,6 +20,7 @@ import java.io.InputStream;
 import static java.util.Collections.singletonMap;
 
 /**
+ * A Zip compressor.
  *
  * @since 2.0
  */
@@ -35,7 +36,7 @@ public class ZipCompressorStrategy implements CompressorStrategy {
   @Override
   public Result<InputStream, Void> compress(TypedValue<InputStream> data) throws CompressionException {
     return Result.<InputStream, Void>builder()
-        .output(new ZipArchiveInputStream(singletonMap("data", data.getValue())))
+        .output(new ZipArchiveInputStream(singletonMap("data", data)))
         .mediaType(ZIP_MEDIA_TYPE)
         .build();
   }

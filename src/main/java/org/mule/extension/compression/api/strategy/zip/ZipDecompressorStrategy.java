@@ -22,6 +22,7 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
 
 /**
+ * A Zip decompressor.
  *
  * @since 2.0
  */

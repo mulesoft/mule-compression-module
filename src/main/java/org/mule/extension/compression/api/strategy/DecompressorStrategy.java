@@ -13,6 +13,8 @@ import org.mule.runtime.api.metadata.TypedValue;
 import java.io.InputStream;
 
 /**
+ * Provides the capability to decompress a compressed content in some format.
+ *
  * @since 2.0
  */
 public interface DecompressorStrategy {

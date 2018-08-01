@@ -19,6 +19,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipException;
 
 /**
+ * A GZip decompressor.
  *
  * @since 2.0
  */

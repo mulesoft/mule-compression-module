@@ -7,6 +7,8 @@
 package org.mule.extension.compression.internal.zip;
 
 import org.mule.extension.compression.internal.error.exception.CompressionException;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 
 import java.io.*;
 import java.util.Map;
@@ -22,7 +24,7 @@ public class ZipArchiveInputStream extends InputStream {
 
   private final InputStream delegate;
 
-  public ZipArchiveInputStream(Map<String, InputStream> entries) {
+  public ZipArchiveInputStream(Map<String, TypedValue<InputStream>> entries) {
     ByteArrayOutputStream holder = new ByteArrayOutputStream();
     ZipOutputStream zip = new ZipOutputStream(holder);
     entries.forEach((name, content) -> addEntry(zip, name, content));
@@ -41,8 +43,9 @@ public class ZipArchiveInputStream extends InputStream {
     }
   }
 
-  private void addEntry(ZipOutputStream zip, String name, InputStream content) {
+  private void addEntry(ZipOutputStream zip, String name, TypedValue<?> entryValue) {
     try {
+      InputStream content = getContent(name, entryValue.getValue());
       ZipEntry newEntry = new ZipEntry(name);
       zip.putNextEntry(newEntry);
       byte[] buffer = new byte[1024];
@@ -54,6 +57,15 @@ public class ZipArchiveInputStream extends InputStream {
     } catch (Exception e) {
       throw new CompressionException(e);
     }
+  }
+
+  private InputStream getContent(String name, Object entryContent) {
+    if (entryContent instanceof InputStream) {
+      return (InputStream) entryContent;
+    } else if (entryContent instanceof CursorStreamProvider) {
+      return ((CursorStreamProvider) entryContent).openCursor();
+    }
+    throw new CompressionException("cannot compress entry [" + name + "], content is not an InputStream");
   }
 
   /**

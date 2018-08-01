@@ -17,6 +17,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import java.io.InputStream;
 
 /**
+ * A Gzip compressor.
  *
  * @since 2.0
  */
