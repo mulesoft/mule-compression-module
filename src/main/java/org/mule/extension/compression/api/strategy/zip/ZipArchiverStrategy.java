@@ -33,15 +33,12 @@ public class ZipArchiverStrategy implements ArchiverStrategy {
   @Inject
   private TransformationService transformationService;
 
-  public ZipArchiverStrategy(TransformationService transformationService) {
-    this.transformationService = transformationService;
-  }
-
   /**
    * {@inheritDoc}
    */
   @Override
   public Result<InputStream, Void> archive(Map<String, TypedValue<InputStream>> entries) {
-    return Result.<InputStream, Void>builder().output(new ZipArchiveInputStream(entries, transformationService)).mediaType(ZIP_MEDIA_TYPE).build();
+    return Result.<InputStream, Void>builder().output(new ZipArchiveInputStream(entries, transformationService))
+        .mediaType(ZIP_MEDIA_TYPE).build();
   }
 }

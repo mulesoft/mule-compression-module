@@ -58,7 +58,7 @@ public class ZipArchiveInputStream extends InputStream {
       if (value instanceof InputStream) {
         return (InputStream) value;
       }
-      return (InputStream) transformationService.transform(value, INPUT_STREAM, entryContent.getDataType());
+      return (InputStream) transformationService.transform(value, entryContent.getDataType(), INPUT_STREAM);
     } catch (Exception e) {
       throw new CompressionException("cannot compress entry [" + name + "], content cannot be transformmed to InputStream");
     }

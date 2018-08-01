@@ -36,10 +36,6 @@ public class ZipCompressorStrategy implements CompressorStrategy {
   @Inject
   private TransformationService transformationService;
 
-  public ZipCompressorStrategy(TransformationService transformationService) {
-    this.transformationService = transformationService;
-  }
-
   /**
    * {@inheritDoc}
    */

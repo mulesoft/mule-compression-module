@@ -45,9 +45,7 @@ public class ZipStrategyTestCase {
   @Rule
   public ExpectedException expected = ExpectedException.none();
 
-  private TransformationService service = mock(TransformationService.class);
-
-  private ZipCompressorStrategy compressor = new ZipCompressorStrategy(service);
+  private ZipCompressorStrategy compressor = new ZipCompressorStrategy();
   private ZipArchiverStrategy archiver = new ZipArchiverStrategy();
   private ZipDecompressorStrategy decompressor = new ZipDecompressorStrategy();
   private ZipExtractorStrategy extractor = new ZipExtractorStrategy();
