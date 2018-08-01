@@ -11,8 +11,6 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 
 import org.mule.extension.compression.api.strategy.DecompressorStrategy;
 import org.mule.extension.compression.internal.error.exception.CompressionException;
-import org.mule.extension.compression.internal.error.exception.DecompressionException;
-import org.mule.extension.compression.internal.error.exception.InvalidArchiveException;
 import org.mule.extension.compression.internal.error.exception.NullArchiveException;
 import org.mule.extension.compression.internal.error.providers.CompressErrorProvider;
 import org.mule.extension.compression.api.strategy.CompressorStrategy;

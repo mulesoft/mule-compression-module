@@ -10,7 +10,10 @@ import org.mule.extension.compression.internal.error.exception.CompressionExcept
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -60,7 +63,7 @@ public class ZipArchiveInputStream extends InputStream {
       }
       return (InputStream) transformationService.transform(value, entryContent.getDataType(), INPUT_STREAM);
     } catch (Exception e) {
-      throw new CompressionException("cannot compress entry [" + name + "], content cannot be transformmed to InputStream");
+      throw new CompressionException("cannot compress entry [" + name + "], content cannot be transformed to InputStream");
     }
   }
 
