@@ -11,10 +11,13 @@ import org.mule.extension.compression.internal.error.exception.CompressionExcept
 import org.mule.extension.compression.internal.zip.ZipArchiveInputStream;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import javax.inject.Inject;
+import javax.xml.crypto.dsig.TransformService;
 import java.io.InputStream;
 
 import static java.util.Collections.singletonMap;
@@ -30,13 +33,20 @@ public class ZipCompressorStrategy implements CompressorStrategy {
 
   private static final MediaType ZIP_MEDIA_TYPE = MediaType.create("application", "zip");
 
+  @Inject
+  private TransformationService transformationService;
+
+  public ZipCompressorStrategy(TransformationService transformationService) {
+    this.transformationService = transformationService;
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
   public Result<InputStream, Void> compress(TypedValue<InputStream> data) throws CompressionException {
     return Result.<InputStream, Void>builder()
-        .output(new ZipArchiveInputStream(singletonMap("data", data)))
+        .output(new ZipArchiveInputStream(singletonMap("data", data), transformationService))
         .mediaType(ZIP_MEDIA_TYPE)
         .build();
   }

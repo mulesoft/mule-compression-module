@@ -10,10 +10,12 @@ import org.mule.extension.compression.api.strategy.ArchiverStrategy;
 import org.mule.extension.compression.internal.zip.ZipArchiveInputStream;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import javax.inject.Inject;
 import java.io.InputStream;
 import java.util.Map;
 
@@ -28,11 +30,18 @@ public class ZipArchiverStrategy implements ArchiverStrategy {
 
   private static final MediaType ZIP_MEDIA_TYPE = MediaType.create("application", "zip");
 
+  @Inject
+  private TransformationService transformationService;
+
+  public ZipArchiverStrategy(TransformationService transformationService) {
+    this.transformationService = transformationService;
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
   public Result<InputStream, Void> archive(Map<String, TypedValue<InputStream>> entries) {
-    return Result.<InputStream, Void>builder().output(new ZipArchiveInputStream(entries)).mediaType(ZIP_MEDIA_TYPE).build();
+    return Result.<InputStream, Void>builder().output(new ZipArchiveInputStream(entries, transformationService)).mediaType(ZIP_MEDIA_TYPE).build();
   }
 }

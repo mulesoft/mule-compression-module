@@ -18,6 +18,7 @@ import org.mule.extension.compression.api.strategy.zip.ZipCompressorStrategy;
 import org.mule.extension.compression.api.strategy.zip.ZipDecompressorStrategy;
 import org.mule.extension.compression.api.strategy.zip.ZipExtractorStrategy;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -28,6 +29,7 @@ import java.util.Map;
 import static java.lang.Thread.currentThread;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mule.extension.compression.CompressionModuleTestUtils.*;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
@@ -43,7 +45,9 @@ public class ZipStrategyTestCase {
   @Rule
   public ExpectedException expected = ExpectedException.none();
 
-  private ZipCompressorStrategy compressor = new ZipCompressorStrategy();
+  private TransformationService service = mock(TransformationService.class);
+
+  private ZipCompressorStrategy compressor = new ZipCompressorStrategy(service);
   private ZipArchiverStrategy archiver = new ZipArchiverStrategy();
   private ZipDecompressorStrategy decompressor = new ZipDecompressorStrategy();
   private ZipExtractorStrategy extractor = new ZipExtractorStrategy();

@@ -26,7 +26,6 @@ public class ZipEntryExtractor {
       while ((length = zip.read(buffer, 0, buffer.length)) >= 0) {
         holder.write(buffer, 0, length);
       }
-      // FIXME: do not consume all
       return new ByteArrayInputStream(holder.toByteArray());
     }
   }

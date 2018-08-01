@@ -8,12 +8,14 @@ package org.mule.extension.compression.internal.zip;
 
 import org.mule.extension.compression.internal.error.exception.CompressionException;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.transformation.TransformationService;
 
 import java.io.*;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 
 /**
  * An {@link InputStream} that represents a compressed content in the zip format.
@@ -23,29 +25,20 @@ import java.util.zip.ZipOutputStream;
 public class ZipArchiveInputStream extends InputStream {
 
   private final InputStream delegate;
+  private TransformationService transformationService;
 
-  public ZipArchiveInputStream(Map<String, TypedValue<InputStream>> entries) {
+  public ZipArchiveInputStream(Map<String, TypedValue<InputStream>> entries,
+                               TransformationService transformationService) {
+    this.transformationService = transformationService;
     ByteArrayOutputStream holder = new ByteArrayOutputStream();
     ZipOutputStream zip = new ZipOutputStream(holder);
     entries.forEach((name, content) -> addEntry(zip, name, content));
-    // fixme
     this.delegate = new ByteArrayInputStream(holder.toByteArray());
-  }
-
-  /**
-   *
-   */
-  private PipedInputStream createDelegate(PipedOutputStream holder) {
-    try {
-      return new PipedInputStream(holder);
-    } catch (IOException e) {
-      throw new CompressionException(e);
-    }
   }
 
   private void addEntry(ZipOutputStream zip, String name, TypedValue<?> entryValue) {
     try {
-      InputStream content = getContent(name, entryValue.getValue());
+      InputStream content = getContent(name, entryValue);
       ZipEntry newEntry = new ZipEntry(name);
       zip.putNextEntry(newEntry);
       byte[] buffer = new byte[1024];
@@ -59,13 +52,16 @@ public class ZipArchiveInputStream extends InputStream {
     }
   }
 
-  private InputStream getContent(String name, Object entryContent) {
-    if (entryContent instanceof InputStream) {
-      return (InputStream) entryContent;
-    } else if (entryContent instanceof CursorStreamProvider) {
-      return ((CursorStreamProvider) entryContent).openCursor();
+  private InputStream getContent(String name, TypedValue<?> entryContent) {
+    try {
+      Object value = entryContent.getValue();
+      if (value instanceof InputStream) {
+        return (InputStream) value;
+      }
+      return (InputStream) transformationService.transform(value, INPUT_STREAM, entryContent.getDataType());
+    } catch (Exception e) {
+      throw new CompressionException("cannot compress entry [" + name + "], content cannot be transformmed to InputStream");
     }
-    throw new CompressionException("cannot compress entry [" + name + "], content is not an InputStream");
   }
 
   /**
