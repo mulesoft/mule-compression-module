@@ -4,29 +4,29 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.compression.internal.zip;
+package org.mule.extension.compression.internal.error.providers;
 
-import static org.mule.extension.compression.api.CompressionError.COULD_NOT_DECOMPRESS;
-import static org.mule.extension.compression.api.CompressionError.INVALID_ZIP;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.mule.extension.compression.internal.error.CompressionError.*;
+
 /**
- * Defines the possible errors for the unzip operation
+ * Defines the possible errors for the decompress operation
  *
  * @since 1.0
  */
-public class UnzipErrorProvider implements ErrorTypeProvider {
+public class DecompressErrorProvider implements ErrorTypeProvider {
 
   @Override
   public Set<ErrorTypeDefinition> getErrorTypes() {
     Set<ErrorTypeDefinition> errors = new HashSet<>();
-    errors.add(INVALID_ZIP);
     errors.add(COULD_NOT_DECOMPRESS);
-
+    errors.add(INVALID_ARCHIVE);
+    errors.add(TOO_MANY_ENTRIES);
     return errors;
   }
 }
