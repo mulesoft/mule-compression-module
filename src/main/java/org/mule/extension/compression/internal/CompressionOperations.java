@@ -17,6 +17,7 @@ import org.mule.extension.compression.api.strategy.CompressorStrategy;
 import org.mule.extension.compression.internal.error.providers.DecompressErrorProvider;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -41,7 +42,8 @@ public class CompressionOperations {
   @Summary("Compresses a given content using an specific format")
   @Throws(CompressErrorProvider.class)
   public Result<InputStream, Void> compress(@Content TypedValue<InputStream> content,
-                                            @Expression(NOT_SUPPORTED) CompressorStrategy compressor) {
+                                            @ParameterDsl(
+                                                allowReferences = false) @Expression(NOT_SUPPORTED) CompressorStrategy compressor) {
     if (content.getValue() == null) {
       throw new CompressionException("cannot compress null content");
     }
@@ -63,7 +65,8 @@ public class CompressionOperations {
   @Throws(DecompressErrorProvider.class)
   @Summary("Decompresses a single entry compressed content")
   public InputStream decompress(@Content TypedValue<InputStream> compressed,
-                                @Expression(NOT_SUPPORTED) DecompressorStrategy decompressor) {
+                                @ParameterDsl(
+                                    allowReferences = false) @Expression(NOT_SUPPORTED) DecompressorStrategy decompressor) {
     if (compressed.getValue() == null) {
       throw new NullArchiveException();
     }

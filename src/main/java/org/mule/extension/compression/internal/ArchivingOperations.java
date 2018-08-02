@@ -15,6 +15,7 @@ import org.mule.extension.compression.internal.error.providers.ExtractErrorProvi
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Content;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
@@ -63,7 +64,8 @@ public class ArchivingOperations {
   @Summary("Compresses a set of entries into a new file in the specified archive format")
   @Throws(ArchiveErrorProvider.class)
   public Result<InputStream, Void> archive(@Content Map<String, TypedValue<InputStream>> entries,
-                                           @Expression(NOT_SUPPORTED) ArchiverStrategy archiver) {
+                                           @ParameterDsl(
+                                               allowReferences = false) @Expression(NOT_SUPPORTED) ArchiverStrategy archiver) {
     if (entries == null) {
       throw new CompressionException("the entries parameter is null");
     }
@@ -77,7 +79,8 @@ public class ArchivingOperations {
   @Throws(ExtractErrorProvider.class)
   @Summary("Decompresses a compressed content in the configured returning a list with all the entries inside it uncompressed")
   public Map<String, InputStream> extract(@Content TypedValue<InputStream> compressed,
-                                          @Expression(NOT_SUPPORTED) ExtractorStrategy extractor) {
+                                          @ParameterDsl(
+                                              allowReferences = false) @Expression(NOT_SUPPORTED) ExtractorStrategy extractor) {
     if (compressed.getValue() == null) {
       throw new NullArchiveException();
     }
