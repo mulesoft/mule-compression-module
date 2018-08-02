@@ -9,6 +9,7 @@ package org.mule.extension.compression.api.strategy.gzip;
 import org.mule.extension.compression.api.strategy.CompressorStrategy;
 import org.mule.extension.compression.internal.error.exception.CompressionException;
 import org.mule.extension.compression.internal.gzip.GzipCompressorInputStream;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
@@ -26,6 +27,11 @@ import java.io.InputStream;
 public class GzipCompressorStrategy implements CompressorStrategy {
 
   /**
+   * GNU Zip, the primary compression format used by Unix-like systems. The compression algorithm is DEFLATE.
+   */
+  private static final MediaType GZIP_MEDIA_TYPE = MediaType.create("application", "gzip");
+
+  /**
    * {@inheritDoc}
    */
   @Override
@@ -33,7 +39,7 @@ public class GzipCompressorStrategy implements CompressorStrategy {
     try {
       return Result.<InputStream, Void>builder()
           .output(new GzipCompressorInputStream(data.getValue()))
-          .mediaType(data.getDataType().getMediaType())
+          .mediaType(GZIP_MEDIA_TYPE)
           .build();
     } catch (Exception e) {
       throw new CompressionException(e);

@@ -31,6 +31,9 @@ import static java.util.Collections.singletonMap;
 @Alias("zip-compressor")
 public class ZipCompressorStrategy implements CompressorStrategy {
 
+  /**
+   * The most widely used compression format on Microsoft Windows.
+   */
   private static final MediaType ZIP_MEDIA_TYPE = MediaType.create("application", "zip");
 
   @Inject

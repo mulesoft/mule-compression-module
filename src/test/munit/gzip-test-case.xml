@@ -30,7 +30,7 @@
         </munit:execution>
         <munit:validation>
             <munit-tools:assert-that expression="#[vars.fileTxtSize]" is="#[MunitTools::greaterThan(vars.compressedFileSize)]"/>
-            <munit-tools:assert-that expression="#[vars.compressed]" is="#[MunitTools::withMediaType('text/plain')]"/>
+            <munit-tools:assert-that expression="#[vars.compressed]" is="#[MunitTools::withMediaType('application/gzip')]"/>
         </munit:validation>
     </munit:test>
 
