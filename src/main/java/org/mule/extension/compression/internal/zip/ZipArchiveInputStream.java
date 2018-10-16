@@ -32,17 +32,17 @@ public class ZipArchiveInputStream extends InputStream {
 
   public ZipArchiveInputStream(Map<String, TypedValue<InputStream>> entries,
                                TransformationService transformationService) {
-    //    try {
-    this.transformationService = transformationService;
-    ByteArrayOutputStream holder = new ByteArrayOutputStream();
-    ZipOutputStream zip = new ZipOutputStream(holder);
-    entries.forEach((name, content) -> addEntry(zip, name, content));
-    //      zip.close();
-    //      holder.close();
-    this.delegate = new ByteArrayInputStream(holder.toByteArray());
-    //    } catch (IOException e) {
-    //      throw new CompressionException(e);
-    //    }
+    try {
+      this.transformationService = transformationService;
+      ByteArrayOutputStream holder = new ByteArrayOutputStream();
+      ZipOutputStream zip = new ZipOutputStream(holder);
+      entries.forEach((name, content) -> addEntry(zip, name, content));
+      zip.close();
+      holder.close();
+      this.delegate = new ByteArrayInputStream(holder.toByteArray());
+    } catch (IOException e) {
+      throw new CompressionException(e);
+    }
   }
 
   private void addEntry(ZipOutputStream zip, String name, TypedValue<?> entryValue) {
