@@ -128,6 +128,8 @@
                     <compression:zip-compressor/>
                 </compression:compressor>
             </compression:compress>
+            <file:write config-ref="tmp-dir" path="file-txt.zip"/>
+            <file:read config-ref="tmp-dir" path="file-txt.zip"/>
             <compression:extract>
                 <compression:extractor>
                     <compression:zip-extractor/>
