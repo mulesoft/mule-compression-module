@@ -116,4 +116,29 @@
             <munit-tools:assert-that expression="#[output text/plain --- payload['dir/in-dir.txt']]" is="#[MunitTools::equalTo('This is the content of a file inside a directory in a zip')]"/>
         </munit:validation>
     </munit:test>
+
+    <munit:test name="readCompressExtract">
+        <munit:behavior>
+            <file:read config-ref="test-resources" path="file.txt" target="fileTxt"/>
+        </munit:behavior>
+        <munit:execution>
+            <compression:compress>
+                <compression:content>#[vars.fileTxt]</compression:content>
+                <compression:compressor>
+                    <compression:zip-compressor/>
+                </compression:compressor>
+            </compression:compress>
+            <file:write config-ref="tmp-dir" path="file-txt.zip"/>
+            <file:read config-ref="tmp-dir" path="file-txt.zip"/>
+            <compression:extract>
+                <compression:extractor>
+                    <compression:zip-extractor/>
+                </compression:extractor>
+            </compression:extract>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[output text/plain --- payload.data]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain'))]"/>
+        </munit:validation>
+    </munit:test>
+
 </mule>
