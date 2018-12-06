@@ -48,7 +48,7 @@ public class CompressionOperations {
                                             @ParameterDsl(
                                                 allowReferences = false) @Expression(NOT_SUPPORTED) CompressorStrategy compressor) {
     if (content.getValue() == null) {
-      throw new CompressionException("cannot archive null content");
+      throw new CompressionException("cannot compress null content");
     }
     return compressor.compress(content);
   }

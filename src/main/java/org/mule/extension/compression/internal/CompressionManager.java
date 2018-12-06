@@ -7,21 +7,34 @@
 package org.mule.extension.compression.internal;
 
 import static java.lang.System.getProperty;
-import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.extension.compression.internal.CompressionExtension.ZIP_MEDIA_TYPE;
+import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.core.api.util.FileUtils.copyStreamToFile;
+import org.mule.extension.compression.internal.error.exception.CompressionException;
 import org.mule.extension.compression.internal.zip.TempZipFile;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.transformation.TransformationService;
+import org.mule.runtime.extension.api.runtime.operation.Result;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.util.Map;
 import java.util.Random;
 
 import javax.inject.Inject;
+
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 
 /**
  * Manages resources necessary for performing compression operations
@@ -36,6 +49,9 @@ public class CompressionManager implements Startable, Stoppable {
   @Inject
   private SchedulerService schedulerService;
 
+  @Inject
+  private TransformationService transformationService;
+
   private Scheduler compressionScheduler;
 
   @Override
@@ -49,12 +65,31 @@ public class CompressionManager implements Startable, Stoppable {
     compressionScheduler = null;
   }
 
-  /**
-   * @return a {@link Scheduler} for performing asynchronous compression operations
-   */
-  public Scheduler getCompressionScheduler() {
-    checkState(compressionScheduler != null, "Compressor not started or stopped");
-    return compressionScheduler;
+  public Result<InputStream, Void> asyncArchive(Map<String, TypedValue<InputStream>> entries) {
+    try {
+      PipedInputStream pipe = new PipedInputStream();
+      PipedOutputStream out = new PipedOutputStream(pipe);
+
+      compressionScheduler.submit(() -> archive(entries, out));
+
+      return Result.<InputStream, Void>builder()
+          .output(new PostActionInputStreamWrapper(pipe, () -> closeQuietly(out)))
+          //.output(pipe)
+          .mediaType(ZIP_MEDIA_TYPE)
+          .build();
+    } catch (CompressionException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new CompressionException(t);
+    }
+  }
+
+  private void closeQuietly(Closeable closeable) {
+    try {
+      closeable.close();
+    } catch (Exception e) {
+
+    }
   }
 
   /**
@@ -74,6 +109,53 @@ public class CompressionManager implements Startable, Stoppable {
     copyStreamToFile(inputStream, file);
 
     return file;
+  }
+
+  /**
+   * Creates an archive of the given entries
+   *
+   * @param entries the entries to archive
+   * @param out     the {@link OutputStream} in which the compressed content is going to be written
+   */
+  private void archive(Map<String, TypedValue<InputStream>> entries, OutputStream out) {
+    try (ZipArchiveOutputStream zip = new ZipArchiveOutputStream(out)) {
+      entries.forEach((name, content) -> addEntry(zip, name, content, transformationService));
+    } catch (IOException e) {
+      throw new CompressionException(e);
+    }
+  }
+
+  private void addEntry(ZipArchiveOutputStream zip,
+                        String name,
+                        TypedValue<InputStream> entryContent,
+                        TransformationService transformationService) {
+    try {
+      ZipArchiveEntry newEntry = new ZipArchiveEntry(name);
+      zip.putArchiveEntry(newEntry);
+
+      byte[] buffer = new byte[1024];
+      int length;
+      InputStream content = getContent(name, entryContent, transformationService);
+
+      while ((length = content.read(buffer)) >= 0) {
+        zip.write(buffer, 0, length);
+      }
+      zip.closeArchiveEntry();
+    } catch (Exception e) {
+      throw new CompressionException(e);
+    }
+  }
+
+  private InputStream getContent(String name, TypedValue<?> entryContent, TransformationService transformationService) {
+    try {
+      Object value = entryContent.getValue();
+      if (value instanceof InputStream) {
+        return (InputStream) value;
+      }
+      return (InputStream) transformationService.transform(value, entryContent.getDataType(), INPUT_STREAM);
+    } catch (Exception e) {
+      throw new CompressionException("cannot archive entry [" + name + "], content cannot be transformed to InputStream");
+    }
   }
 
 }

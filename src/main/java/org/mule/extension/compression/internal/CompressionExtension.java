@@ -38,6 +38,9 @@ import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 @ErrorTypes(CompressionError.class)
 public class CompressionExtension {
 
+  /**
+   * The primary compression format used in Windows
+   */
   public static final MediaType ZIP_MEDIA_TYPE = create("application", "zip");
 
   /**

@@ -63,7 +63,7 @@
     <munit:test name="bigContentRoundtrip">
         <munit:behavior>
             <set-variable variableName="bigContent"
-                          value="#[java!org::apache::commons::lang3::RandomStringUtils::randomAlphabetic(200 * 1024 * 1024)]"/>
+                          value="#[java!org::apache::commons::lang3::RandomStringUtils::randomAlphabetic(50 * 1024 * 1024)]"/>
         </munit:behavior>
         <munit:execution>
             <compression:compress>
