@@ -31,7 +31,7 @@ public enum CompressionError implements ErrorTypeDefinition<CompressionError> {
   COULD_NOT_DECOMPRESS,
 
   /**
-   * Error occurred while trying to archive
+   * Error occurred while trying to compress
    */
   COULD_NOT_COMPRESS
 }

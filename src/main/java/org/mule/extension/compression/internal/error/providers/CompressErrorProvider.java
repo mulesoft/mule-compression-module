@@ -6,16 +6,15 @@
  */
 package org.mule.extension.compression.internal.error.providers;
 
+import static org.mule.extension.compression.internal.error.CompressionError.COULD_NOT_COMPRESS;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypeProvider;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.mule.extension.compression.internal.error.CompressionError.*;
-
 /**
- * Defines the possible errors for the archive operation
+ * Defines the possible errors for the compress operation
  *
  * @since 1.0
  */
