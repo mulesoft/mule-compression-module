@@ -13,7 +13,7 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import java.io.InputStream;
 
 /**
- * Provides the capability to compress data in some compression format.
+ * Provides the capability to archive data in some compression format.
  *
  * @since 2.0
  */

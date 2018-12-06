@@ -6,10 +6,9 @@
  */
 package org.mule.extension.compression.internal.error.exception;
 
+import static org.mule.extension.compression.internal.error.CompressionError.INVALID_ARCHIVE;
 import org.mule.extension.compression.internal.error.CompressionError;
 import org.mule.runtime.extension.api.exception.ModuleException;
-
-import static org.mule.extension.compression.internal.error.CompressionError.INVALID_ARCHIVE;
 
 /**
  * A {@link ModuleException} to signal that an invalid archive was passed to a decompression/extract operation.
@@ -26,5 +25,9 @@ public class InvalidArchiveException extends DecompressionException {
 
   public InvalidArchiveException() {
     super("The provided archive is not valid", INVALID_ARCHIVE);
+  }
+
+  public InvalidArchiveException(String message) {
+    super(message, INVALID_ARCHIVE);
   }
 }

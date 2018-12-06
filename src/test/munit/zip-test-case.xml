@@ -60,6 +60,31 @@
         </munit:validation>
     </munit:test>
 
+    <munit:test name="bigContentRoundtrip">
+        <munit:behavior>
+            <set-variable variableName="bigContent"
+                          value="#[java!org::apache::commons::lang3::RandomStringUtils::randomAlphabetic(200 * 1024 * 1024)]"/>
+        </munit:behavior>
+        <munit:execution>
+            <compression:compress>
+                <non-repeatable-stream/>
+                <compression:content>#[vars.bigContent]</compression:content>
+                <compression:compressor>
+                    <compression:zip-compressor/>
+                </compression:compressor>
+            </compression:compress>
+            <compression:decompress outputMimeType="text/plain">
+                <non-repeatable-stream/>
+                <compression:decompressor>
+                    <compression:zip-decompressor/>
+                </compression:decompressor>
+            </compression:decompress>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo(vars.bigContent)]"/>
+        </munit:validation>
+    </munit:test>
+
     <munit:test name="archive">
         <munit:behavior >
             <file:read config-ref="test-resources" path="file.txt" target="entry1" outputMimeType="text/plain"/>
@@ -117,6 +142,31 @@
         </munit:validation>
     </munit:test>
 
+    <munit:test name="repeatableExtract">
+        <munit:behavior>
+            <file:read config-ref="test-resources" path="archive.zip" target="archive"/>
+        </munit:behavior>
+        <munit:execution>
+            <compression:extract>
+                <compression:compressed>#[vars.archive]</compression:compressed>
+                <compression:extractor>
+                    <compression:zip-extractor/>
+                </compression:extractor>
+            </compression:extract>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[sizeOf(payload)]" is="#[MunitTools::equalTo(2)]"/>
+
+            <!-- Do all assertions twice to validate that the streams are repeatable -->
+            
+            <munit-tools:assert-that expression="#[output text/plain --- payload['file.txt']]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain'))]"/>
+            <munit-tools:assert-that expression="#[output text/plain --- payload['file.txt']]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain'))]"/>
+
+            <munit-tools:assert-that expression="#[output text/plain --- payload['dir/in-dir.txt']]" is="#[MunitTools::equalTo('This is the content of a file inside a directory in a zip')]"/>
+            <munit-tools:assert-that expression="#[output text/plain --- payload['dir/in-dir.txt']]" is="#[MunitTools::equalTo('This is the content of a file inside a directory in a zip')]"/>
+        </munit:validation>
+    </munit:test>
+
     <munit:test name="readCompressExtract">
         <munit:behavior>
             <file:read config-ref="test-resources" path="file.txt" target="fileTxt"/>
@@ -140,5 +190,7 @@
             <munit-tools:assert-that expression="#[output text/plain --- payload.data]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain'))]"/>
         </munit:validation>
     </munit:test>
+
+
 
 </mule>

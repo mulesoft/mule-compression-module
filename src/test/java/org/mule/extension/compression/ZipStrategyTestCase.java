@@ -6,36 +6,43 @@
  */
 package org.mule.extension.compression;
 
-import com.google.common.collect.ImmutableMap;
-import org.hamcrest.collection.IsMapContaining;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mule.extension.compression.internal.error.exception.InvalidArchiveException;
-import org.mule.extension.compression.internal.error.exception.TooManyEntriesException;
+import static java.lang.Thread.currentThread;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThan;
+import static org.junit.Assert.assertThat;
+import static org.mule.extension.compression.CompressionModuleTestUtils.DATA_SIZE;
+import static org.mule.extension.compression.CompressionModuleTestUtils.FILE_TXT_DATA;
+import static org.mule.extension.compression.CompressionModuleTestUtils.FILE_TXT_NAME;
+import static org.mule.extension.compression.CompressionModuleTestUtils.TEST_DATA;
+import static org.mule.extension.compression.CompressionModuleTestUtils.asTextTypedValue;
+import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
+import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
+import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import org.mule.extension.compression.api.strategy.zip.ZipArchiverStrategy;
 import org.mule.extension.compression.api.strategy.zip.ZipCompressorStrategy;
 import org.mule.extension.compression.api.strategy.zip.ZipDecompressorStrategy;
 import org.mule.extension.compression.api.strategy.zip.ZipExtractorStrategy;
+import org.mule.extension.compression.internal.error.exception.InvalidArchiveException;
+import org.mule.extension.compression.internal.error.exception.TooManyEntriesException;
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+
+import com.google.common.collect.ImmutableMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Map;
 
-import static java.lang.Thread.currentThread;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mule.extension.compression.CompressionModuleTestUtils.*;
-import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
-import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
-import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
+import org.hamcrest.collection.IsMapContaining;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-public class ZipStrategyTestCase {
+public class ZipStrategyTestCase extends FunctionalTestCase {
 
   private static final String ZIP_TEST_SINGLE_ENTRY_ARCHIVE_NAME = "file.txt.zip";
   private static final String ZIP_TEST_ARCHIVE_NAME = "archive.zip";
@@ -49,6 +56,19 @@ public class ZipStrategyTestCase {
   private ZipArchiverStrategy archiver = new ZipArchiverStrategy();
   private ZipDecompressorStrategy decompressor = new ZipDecompressorStrategy();
   private ZipExtractorStrategy extractor = new ZipExtractorStrategy();
+
+  @Override
+  protected String[] getConfigFiles() {
+    return new String[] {};
+  }
+
+  @Override
+  protected void doSetUp() throws Exception {
+    muleContext.getInjector().inject(compressor);
+    muleContext.getInjector().inject(decompressor);
+    muleContext.getInjector().inject(archiver);
+    muleContext.getInjector().inject(extractor);
+  }
 
   @Test
   public void compress() {

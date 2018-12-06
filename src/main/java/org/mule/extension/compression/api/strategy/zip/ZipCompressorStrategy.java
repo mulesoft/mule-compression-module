@@ -6,21 +6,23 @@
  */
 package org.mule.extension.compression.api.strategy.zip;
 
+import static java.util.Collections.singletonMap;
+import static org.mule.extension.compression.internal.CompressionExtension.ZIP_MEDIA_TYPE;
+import static org.mule.extension.compression.internal.zip.ZipUtils.archive;
 import org.mule.extension.compression.api.strategy.CompressorStrategy;
+import org.mule.extension.compression.internal.CompressionManager;
 import org.mule.extension.compression.internal.error.exception.CompressionException;
-import org.mule.extension.compression.internal.zip.ZipArchiveInputStream;
-import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import javax.inject.Inject;
-import javax.xml.crypto.dsig.TransformService;
 import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 
-import static java.util.Collections.singletonMap;
+import javax.inject.Inject;
 
 /**
  * A Zip compressor.
@@ -31,10 +33,8 @@ import static java.util.Collections.singletonMap;
 @Alias("zip-compressor")
 public class ZipCompressorStrategy implements CompressorStrategy {
 
-  /**
-   * The most widely used compression format on Microsoft Windows.
-   */
-  private static final MediaType ZIP_MEDIA_TYPE = MediaType.create("application", "zip");
+  @Inject
+  private CompressionManager compressionManager;
 
   @Inject
   private TransformationService transformationService;
@@ -44,9 +44,20 @@ public class ZipCompressorStrategy implements CompressorStrategy {
    */
   @Override
   public Result<InputStream, Void> compress(TypedValue<InputStream> data) throws CompressionException {
-    return Result.<InputStream, Void>builder()
-        .output(new ZipArchiveInputStream(singletonMap("data", data), transformationService))
-        .mediaType(ZIP_MEDIA_TYPE)
-        .build();
+    try {
+      PipedInputStream stream = new PipedInputStream();
+      PipedOutputStream out = new PipedOutputStream(stream);
+
+      compressionManager.getCompressionScheduler().submit(() -> archive(singletonMap("data", data), out, transformationService));
+
+      return Result.<InputStream, Void>builder()
+          .output(stream)
+          .mediaType(ZIP_MEDIA_TYPE)
+          .build();
+    } catch (CompressionException e) {
+      throw e;
+    } catch (Throwable t) {
+      throw new CompressionException(t);
+    }
   }
 }

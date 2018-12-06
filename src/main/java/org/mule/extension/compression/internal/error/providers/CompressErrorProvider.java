@@ -15,7 +15,7 @@ import java.util.Set;
 import static org.mule.extension.compression.internal.error.CompressionError.*;
 
 /**
- * Defines the possible errors for the compress operation
+ * Defines the possible errors for the archive operation
  *
  * @since 1.0
  */

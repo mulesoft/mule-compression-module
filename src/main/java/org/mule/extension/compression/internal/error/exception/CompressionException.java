@@ -12,7 +12,7 @@ import org.mule.runtime.extension.api.exception.ModuleException;
 import static org.mule.extension.compression.internal.error.CompressionError.COULD_NOT_COMPRESS;
 
 /**
- * A {@link ModuleException} to signal that an unexpected error occurred while trying to compress a content.
+ * A {@link ModuleException} to signal that an unexpected error occurred while trying to archive a content.
  * <p>
  * This exception will be associated to a {@link CompressionError#COULD_NOT_COMPRESS} error type.
  *
@@ -21,10 +21,10 @@ import static org.mule.extension.compression.internal.error.CompressionError.COU
 public class CompressionException extends ModuleException {
 
   public CompressionException(Throwable cause) {
-    super("Unexpected error occur while trying to compress: " + cause.getMessage(), COULD_NOT_COMPRESS, cause);
+    super("Unexpected error occur while trying to archive: " + cause.getMessage(), COULD_NOT_COMPRESS, cause);
   }
 
   public CompressionException(String message) {
-    super("Unexpected error occur while trying to compress: " + message, COULD_NOT_COMPRESS);
+    super("Unexpected error occur while trying to archive: " + message, COULD_NOT_COMPRESS);
   }
 }

@@ -6,21 +6,27 @@
  */
 package org.mule.extension.compression.api.strategy.zip;
 
+import static org.apache.commons.compress.archivers.zip.ZipFile.closeQuietly;
 import org.mule.extension.compression.api.strategy.ExtractorStrategy;
+import org.mule.extension.compression.internal.CompressionManager;
+import org.mule.extension.compression.internal.PostActionInputStreamWrapper;
 import org.mule.extension.compression.internal.error.exception.DecompressionException;
 import org.mule.extension.compression.internal.error.exception.InvalidArchiveException;
-import org.mule.extension.compression.internal.zip.ZipEntryExtractor;
+import org.mule.extension.compression.internal.zip.TempZipFile;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
 import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
-import java.util.zip.ZipInputStream;
+
+import javax.inject.Inject;
+
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 
 /**
  * A Zip extractor.
@@ -31,31 +37,61 @@ import java.util.zip.ZipInputStream;
 @Alias("zip-extractor")
 public class ZipExtractorStrategy implements ExtractorStrategy {
 
-  private static final ZipEntryExtractor entryExtractor = new ZipEntryExtractor();
+  @Inject
+  private CompressionManager compressionManager;
 
   /**
    * {@inheritDoc}
    */
   @Override
   public Map<String, InputStream> extract(TypedValue<InputStream> archive) {
-    InputStream content = archive.getValue();
-    Map<String, InputStream> entries = new HashMap<>();
-    try (ZipInputStream zip = new ZipInputStream(content)) {
-      ZipEntry entry = zip.getNextEntry();
-      if (entry == null) {
-        throw new InvalidArchiveException();
+    TempZipFile zip = null;
+    try {
+      zip = compressionManager.toTempZip(archive.getValue());
+      Enumeration<ZipArchiveEntry> entries = zip.getEntries();
+      if (!entries.hasMoreElements()) {
+        throw new InvalidArchiveException("The provided archive has no entries");
       }
-      while (entry != null) {
-        entries.put(entry.getName(), entryExtractor.extractEntry(zip));
-        entry = zip.getNextEntry();
+
+      Map<String, InputStream> files = new HashMap<>();
+      FinalCountDown countDown = new FinalCountDown(zip::closeSafely);
+      while (entries.hasMoreElements()) {
+        ZipArchiveEntry entry = entries.nextElement();
+        InputStream stream = new PostActionInputStreamWrapper(zip.getInputStream(entry), countDown::countDown);
+        files.put(entry.getName(), stream);
+        countDown.countUp();
       }
+
+      return files;
     } catch (ModuleException e) {
+      closeQuietly(zip);
       throw e;
     } catch (ZipException e) {
+      closeQuietly(zip);
       throw new InvalidArchiveException(e);
     } catch (Exception e) {
+      closeQuietly(zip);
       throw new DecompressionException(e);
     }
-    return entries;
+  }
+
+  private class FinalCountDown {
+
+    private int count = 0;
+    private final Runnable action;
+
+    public FinalCountDown(Runnable action) {
+      this.action = action;
+    }
+
+    public void countUp() {
+      count++;
+    }
+
+    public void countDown() {
+      if (--count == 0) {
+        action.run();
+      }
+    }
   }
 }
