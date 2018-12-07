@@ -62,8 +62,9 @@
 
     <munit:test name="bigContentRoundtrip">
         <munit:behavior>
+            <set-variable variableName="payloadSize" value="#[output application/java --- 100 * 1024 * 1024]" />
             <set-variable variableName="bigContent"
-                          value="#[java!org::apache::commons::lang3::RandomStringUtils::randomAlphabetic(50 * 1024 * 1024)]"/>
+                          value="#[java!org::mule::extension::compression::TestUtils::inputStream(vars.payloadSize)]"/>
         </munit:behavior>
         <munit:execution>
             <compression:compress>
@@ -81,7 +82,7 @@
             </compression:decompress>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::equalTo(vars.bigContent)]"/>
+            <munit-tools:assert-that expression="#[output application/java --- sizeOf(payload)]" is="#[MunitTools::equalTo(vars.payloadSize)]"/>
         </munit:validation>
     </munit:test>
 
@@ -136,7 +137,7 @@
             </compression:extract>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-that expression="#[sizeOf(payload)]" is="#[MunitTools::equalTo(2)]"/>
+            <munit-tools:assert-that expression="#[output application/java --- sizeOf(payload)]" is="#[MunitTools::equalTo(2)]"/>
             <munit-tools:assert-that expression="#[output text/plain --- payload['file.txt']]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain'))]"/>
             <munit-tools:assert-that expression="#[output text/plain --- payload['dir/in-dir.txt']]" is="#[MunitTools::equalTo('This is the content of a file inside a directory in a zip')]"/>
         </munit:validation>
@@ -155,7 +156,7 @@
             </compression:extract>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert-that expression="#[sizeOf(payload)]" is="#[MunitTools::equalTo(2)]"/>
+            <munit-tools:assert-that expression="#[output application/java --- sizeOf(payload)]" is="#[MunitTools::equalTo(2)]"/>
 
             <!-- Do all assertions twice to validate that the streams are repeatable -->
             

@@ -21,7 +21,6 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,22 +72,13 @@ public class CompressionManager implements Startable, Stoppable {
       compressionScheduler.submit(() -> archive(entries, out));
 
       return Result.<InputStream, Void>builder()
-          .output(new PostActionInputStreamWrapper(pipe, () -> closeQuietly(out)))
-          //.output(pipe)
+          .output(pipe)
           .mediaType(ZIP_MEDIA_TYPE)
           .build();
     } catch (CompressionException e) {
       throw e;
     } catch (Throwable t) {
       throw new CompressionException(t);
-    }
-  }
-
-  private void closeQuietly(Closeable closeable) {
-    try {
-      closeable.close();
-    } catch (Exception e) {
-
     }
   }
 
