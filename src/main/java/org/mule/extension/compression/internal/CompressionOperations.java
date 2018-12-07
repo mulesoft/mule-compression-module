@@ -35,8 +35,11 @@ public class CompressionOperations {
 
   /**
    * Compresses a given content using the configured format, ZIP or GZIP.
-   *
+   * <p>
    * If a problem occur while compressing the content a COULD_NOT_COMPRESS error will be thrown.
+   *
+   * @param content    the content to be compressed
+   * @param compressor the compression strategy
    */
   @MediaType(value = ANY, strict = false)
   @Summary("Compresses a given content using an specific format")
@@ -53,13 +56,16 @@ public class CompressionOperations {
 
   /**
    * Decompresses a given single entry compressed content which is assumed to be in an specific format (ZIP or GZIP).
-   *
+   * <p>
    * If the given content is not in the configured format an INVALID_ARCHIVE error will be thrown.
-   *
+   * <p>
    * Compressed archives can have multiple entries, this operation can handle only single entry archives because if the archive
    * would contain more than one the operation wouldn't know which should return, if the content has more than one entry an
    * TOO_MANY_ENTRIES error will be thrown. For multiple entry archives use the `extract` operation of this module, which will
    * let you choose only formats that accept multiple entries.
+   *
+   * @param compressed   the content to be decompressed
+   * @param decompressor the decompression strategy
    */
   @MediaType(value = ANY, strict = false)
   @Throws(DecompressErrorProvider.class)

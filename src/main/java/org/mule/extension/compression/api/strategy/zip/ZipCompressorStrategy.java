@@ -6,21 +6,18 @@
  */
 package org.mule.extension.compression.api.strategy.zip;
 
+import static java.util.Collections.singletonMap;
 import org.mule.extension.compression.api.strategy.CompressorStrategy;
+import org.mule.extension.compression.internal.CompressionManager;
 import org.mule.extension.compression.internal.error.exception.CompressionException;
-import org.mule.extension.compression.internal.zip.ZipArchiveInputStream;
-import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import javax.inject.Inject;
-import javax.xml.crypto.dsig.TransformService;
 import java.io.InputStream;
 
-import static java.util.Collections.singletonMap;
+import javax.inject.Inject;
 
 /**
  * A Zip compressor.
@@ -31,22 +28,14 @@ import static java.util.Collections.singletonMap;
 @Alias("zip-compressor")
 public class ZipCompressorStrategy implements CompressorStrategy {
 
-  /**
-   * The most widely used compression format on Microsoft Windows.
-   */
-  private static final MediaType ZIP_MEDIA_TYPE = MediaType.create("application", "zip");
-
   @Inject
-  private TransformationService transformationService;
+  private CompressionManager compressionManager;
 
   /**
    * {@inheritDoc}
    */
   @Override
   public Result<InputStream, Void> compress(TypedValue<InputStream> data) throws CompressionException {
-    return Result.<InputStream, Void>builder()
-        .output(new ZipArchiveInputStream(singletonMap("data", data), transformationService))
-        .mediaType(ZIP_MEDIA_TYPE)
-        .build();
+    return compressionManager.asyncArchive(singletonMap("data", data));
   }
 }
