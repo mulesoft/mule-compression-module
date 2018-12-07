@@ -6,10 +6,9 @@
  */
 package org.mule.extension.compression.internal.error.exception;
 
+import static org.mule.extension.compression.internal.error.CompressionError.COULD_NOT_COMPRESS;
 import org.mule.extension.compression.internal.error.CompressionError;
 import org.mule.runtime.extension.api.exception.ModuleException;
-
-import static org.mule.extension.compression.internal.error.CompressionError.COULD_NOT_COMPRESS;
 
 /**
  * A {@link ModuleException} to signal that an unexpected error occurred while trying to compress a content.
