@@ -20,7 +20,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import static java.lang.Thread.currentThread;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.equalToIgnoringWhiteSpace;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.compression.CompressionModuleTestUtils.*;
 import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
