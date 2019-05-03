@@ -6,20 +6,11 @@
  */
 package org.mule.extension.compression;
 
-import static java.lang.Thread.currentThread;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertThat;
-import static org.mule.extension.compression.CompressionModuleTestUtils.DATA_SIZE;
-import static org.mule.extension.compression.CompressionModuleTestUtils.FILE_TXT_DATA;
-import static org.mule.extension.compression.CompressionModuleTestUtils.FILE_TXT_NAME;
-import static org.mule.extension.compression.CompressionModuleTestUtils.TEST_DATA;
-import static org.mule.extension.compression.CompressionModuleTestUtils.asTextTypedValue;
-import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
-import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
-import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
+import com.google.common.collect.ImmutableMap;
+import org.hamcrest.collection.IsMapContaining;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mule.extension.compression.api.strategy.zip.ZipArchiverStrategy;
 import org.mule.extension.compression.api.strategy.zip.ZipCompressorStrategy;
 import org.mule.extension.compression.api.strategy.zip.ZipDecompressorStrategy;
@@ -31,16 +22,17 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Map;
 
-import org.hamcrest.collection.IsMapContaining;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import static java.lang.Thread.currentThread;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
+import static org.mule.extension.compression.CompressionModuleTestUtils.*;
+import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
+import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
+import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 
 public class ZipStrategyTestCase extends FunctionalTestCase {
 
@@ -97,7 +89,7 @@ public class ZipStrategyTestCase extends FunctionalTestCase {
     byte[] expectedBytes = toByteArray(expected);
 
     assertThat(resultBytes.length, greaterThan(expectedBytes.length));
-    assertThat(new String(resultBytes), equalTo(FILE_TXT_DATA));
+    assertThat(new String(resultBytes), equalToIgnoringWhiteSpace(FILE_TXT_DATA));
   }
 
   @Test
@@ -118,7 +110,7 @@ public class ZipStrategyTestCase extends FunctionalTestCase {
     assertThat(extracted, IsMapContaining.hasKey(fileInDirName));
     assertThat(extracted, IsMapContaining.hasKey(FILE_TXT_NAME));
     assertThat(IOUtils.toString(extracted.get(fileInDirName)), is(FILE_CONTENT_INSIDE_DIR));
-    assertThat(IOUtils.toString(extracted.get(FILE_TXT_NAME)), is(FILE_TXT_DATA));
+    assertThat(IOUtils.toString(extracted.get(FILE_TXT_NAME)), equalToIgnoringWhiteSpace(FILE_TXT_DATA));
   }
 
   @Test
