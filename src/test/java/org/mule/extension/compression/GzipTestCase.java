@@ -6,19 +6,6 @@
  */
 package org.mule.extension.compression;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mule.extension.compression.api.strategy.gzip.GzipCompressorStrategy;
-import org.mule.extension.compression.api.strategy.gzip.GzipDecompressorStrategy;
-import org.mule.extension.compression.internal.error.exception.InvalidArchiveException;
-import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.extension.api.runtime.operation.Result;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
 import static java.lang.Thread.currentThread;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringWhiteSpace;
@@ -31,6 +18,19 @@ import static org.mule.extension.compression.CompressionModuleTestUtils.FILE_TXT
 import static org.mule.extension.compression.CompressionModuleTestUtils.TEST_DATA;
 import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mule.extension.compression.api.strategy.gzip.GzipCompressorStrategy;
+import org.mule.extension.compression.api.strategy.gzip.GzipDecompressorStrategy;
+import org.mule.extension.compression.internal.error.exception.InvalidArchiveException;
+import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.core.api.util.IOUtils;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 public class GzipTestCase {
 
