@@ -6,6 +6,21 @@
  */
 package org.mule.extension.compression;
 
+import static java.lang.Thread.currentThread;
+import static org.hamcrest.Matchers.equalToIgnoringWhiteSpace;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThan;
+import static org.junit.Assert.assertThat;
+import static org.mule.extension.compression.CompressionModuleTestUtils.asTextTypedValue;
+import static org.mule.extension.compression.CompressionModuleTestUtils.DATA_SIZE;
+import static org.mule.extension.compression.CompressionModuleTestUtils.FILE_TXT_DATA;
+import static org.mule.extension.compression.CompressionModuleTestUtils.FILE_TXT_NAME;
+import static org.mule.extension.compression.CompressionModuleTestUtils.TEST_DATA;
+import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
+import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
+import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
+
 import com.google.common.collect.ImmutableMap;
 import org.hamcrest.collection.IsMapContaining;
 import org.junit.Rule;
@@ -26,20 +41,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Map;
 
-import static java.lang.Thread.currentThread;
-import static org.hamcrest.Matchers.equalToIgnoringWhiteSpace;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertThat;
-import static org.mule.extension.compression.CompressionModuleTestUtils.asTextTypedValue;
-import static org.mule.extension.compression.CompressionModuleTestUtils.DATA_SIZE;
-import static org.mule.extension.compression.CompressionModuleTestUtils.FILE_TXT_DATA;
-import static org.mule.extension.compression.CompressionModuleTestUtils.FILE_TXT_NAME;
-import static org.mule.extension.compression.CompressionModuleTestUtils.TEST_DATA;
-import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
-import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
-import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 
 public class ZipStrategyTestCase extends FunctionalTestCase {
 
