@@ -20,8 +20,8 @@ import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.Test;
 import org.mule.extension.compression.api.strategy.gzip.GzipCompressorStrategy;
 import org.mule.extension.compression.api.strategy.gzip.GzipDecompressorStrategy;
 import org.mule.extension.compression.internal.error.exception.InvalidArchiveException;
