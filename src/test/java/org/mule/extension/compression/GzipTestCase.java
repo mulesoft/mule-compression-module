@@ -7,25 +7,31 @@
 package org.mule.extension.compression;
 
 import static java.lang.Thread.currentThread;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.equalToIgnoringWhiteSpace;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.compression.CompressionModuleTestUtils.*;
+import static org.mule.extension.compression.CompressionModuleTestUtils.DATA_SIZE;
+import static org.mule.extension.compression.CompressionModuleTestUtils.FILE_TXT_DATA;
+import static org.mule.extension.compression.CompressionModuleTestUtils.FILE_TXT_NAME;
+import static org.mule.extension.compression.CompressionModuleTestUtils.TEST_DATA;
 import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 
-import org.junit.rules.ExpectedException;
 import org.mule.extension.compression.api.strategy.gzip.GzipCompressorStrategy;
 import org.mule.extension.compression.api.strategy.gzip.GzipDecompressorStrategy;
 import org.mule.extension.compression.internal.error.exception.InvalidArchiveException;
 import org.mule.runtime.api.metadata.TypedValue;
-
-import org.junit.Rule;
-import org.junit.Test;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
+import org.junit.Test;
 
 public class GzipTestCase {
 
@@ -55,7 +61,7 @@ public class GzipTestCase {
     byte[] expectedBytes = toByteArray(currentThread().getContextClassLoader().getResourceAsStream(GZIP_TEST_FILE_NAME));
 
     assertThat(resultBytes.length, greaterThan(expectedBytes.length));
-    assertThat(new String(resultBytes), equalTo(FILE_TXT_DATA));
+    assertThat(new String(resultBytes), equalToIgnoringWhiteSpace(FILE_TXT_DATA));
   }
 
   @Test
