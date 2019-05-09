@@ -21,11 +21,6 @@ import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 
-import com.google.common.collect.ImmutableMap;
-import org.hamcrest.collection.IsMapContaining;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-import org.junit.Test;
 import org.mule.extension.compression.api.strategy.zip.ZipArchiverStrategy;
 import org.mule.extension.compression.api.strategy.zip.ZipCompressorStrategy;
 import org.mule.extension.compression.api.strategy.zip.ZipDecompressorStrategy;
@@ -41,6 +36,11 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
+import org.hamcrest.collection.IsMapContaining;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
+import org.junit.Test;
 
 public class ZipStrategyTestCase extends FunctionalTestCase {
 

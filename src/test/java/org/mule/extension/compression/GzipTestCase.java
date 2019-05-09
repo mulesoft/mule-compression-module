@@ -19,9 +19,6 @@ import static org.mule.extension.compression.CompressionModuleTestUtils.TEST_DAT
 import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-import org.junit.Test;
 import org.mule.extension.compression.api.strategy.gzip.GzipCompressorStrategy;
 import org.mule.extension.compression.api.strategy.gzip.GzipDecompressorStrategy;
 import org.mule.extension.compression.internal.error.exception.InvalidArchiveException;
@@ -31,6 +28,10 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
+import org.junit.Test;
 
 public class GzipTestCase {
 
