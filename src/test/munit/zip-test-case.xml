@@ -138,7 +138,7 @@
         </munit:execution>
         <munit:validation>
             <munit-tools:assert-that expression="#[output application/java --- sizeOf(payload)]" is="#[MunitTools::equalTo(2)]"/>
-            <munit-tools:assert-that expression="#[output text/plain --- payload['file.txt']]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain'))]"/>
+            <munit-tools:assert-that expression="#[output text/plain --- payload['file.txt']]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain') replace '\r' with(''))]"/>
             <munit-tools:assert-that expression="#[output text/plain --- payload['dir/in-dir.txt']]" is="#[MunitTools::equalTo('This is the content of a file inside a directory in a zip')]"/>
         </munit:validation>
     </munit:test>
@@ -160,8 +160,8 @@
 
             <!-- Do all assertions twice to validate that the streams are repeatable -->
             
-            <munit-tools:assert-that expression="#[output text/plain --- payload['file.txt']]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain'))]"/>
-            <munit-tools:assert-that expression="#[output text/plain --- payload['file.txt']]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain'))]"/>
+            <munit-tools:assert-that expression="#[output text/plain --- payload['file.txt']]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain') replace '\r' with(''))]"/>
+            <munit-tools:assert-that expression="#[output text/plain --- payload['file.txt']]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain') replace '\r' with(''))]"/>
 
             <munit-tools:assert-that expression="#[output text/plain --- payload['dir/in-dir.txt']]" is="#[MunitTools::equalTo('This is the content of a file inside a directory in a zip')]"/>
             <munit-tools:assert-that expression="#[output text/plain --- payload['dir/in-dir.txt']]" is="#[MunitTools::equalTo('This is the content of a file inside a directory in a zip')]"/>
