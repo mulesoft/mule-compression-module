@@ -49,13 +49,7 @@
         </munit:execution>
         <munit:validation>
             <munit-tools:assert>
-                <munit-tools:that>
-                    #[
-                        import * from dw::test::Asserts
-                        ---
-                        payload must equalToResource("file.txt", "text/plain")
-                    ]
-                </munit-tools:that>
+                <munit-tools:assert-that  expression="#[payload]" is="#[MunitTools::equalTo( readUrl('classpath://file.txt', 'text/plain') replace '\r' with(''))]"/>
             </munit-tools:assert>
         </munit:validation>
     </munit:test>
