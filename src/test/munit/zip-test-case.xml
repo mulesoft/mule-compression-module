@@ -48,9 +48,7 @@
             </compression:decompress>
         </munit:execution>
         <munit:validation>
-            <munit-tools:assert>
                 <munit-tools:assert-that  expression="#[payload]" is="#[MunitTools::equalTo( readUrl('classpath://file.txt', 'text/plain') replace '\r' with(''))]"/>
-            </munit-tools:assert>
         </munit:validation>
     </munit:test>
 
@@ -153,7 +151,7 @@
             <munit-tools:assert-that expression="#[output application/java --- sizeOf(payload)]" is="#[MunitTools::equalTo(2)]"/>
 
             <!-- Do all assertions twice to validate that the streams are repeatable -->
-            
+
             <munit-tools:assert-that expression="#[output text/plain --- payload['file.txt']]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain') replace '\r' with(''))]"/>
             <munit-tools:assert-that expression="#[output text/plain --- payload['file.txt']]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain') replace '\r' with(''))]"/>
 
