@@ -23,8 +23,8 @@
         <file.connector.version>1.2.2</file.connector.version>
         <munit.input.directory>src/test/munit</munit.input.directory>
         <munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
-        <munit.extensions.maven.plugin.version>1.0.0-BETA</munit.extensions.maven.plugin.version>
-        <munit.version>2.2.0-BETA</munit.version>
+        <munit.extensions.maven.plugin.version>1.0.0-BETA2</munit.extensions.maven.plugin.version>
+        <munit.version>2.2.1</munit.version>
         <mavenResourcesVersion>3.0.2</mavenResourcesVersion>
         <javax.jaxb-api.version>2.3.0</javax.jaxb-api.version>
     </properties>
