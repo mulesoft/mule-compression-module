@@ -1,4 +1,3 @@
-Map pipelineParams = [ "mavenTestGoal" : "clean verify",
-]
+Map pipelineParams = [:]
 
 runtimeExtensionsBuild(pipelineParams)
