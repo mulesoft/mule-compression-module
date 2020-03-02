@@ -16,6 +16,7 @@ import org.mule.extension.compression.internal.error.providers.ArchiveErrorProvi
 import org.mule.extension.compression.internal.error.providers.ExtractErrorProvider;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.Streaming;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Content;
@@ -82,6 +83,7 @@ public class ArchivingOperations {
    */
   @MediaType(value = ANY, strict = false)
   @Throws(ExtractErrorProvider.class)
+  @Streaming
   @Summary("Decompresses a compressed content in the configured returning a list with all the entries inside it uncompressed")
   public Map<String, InputStream> extract(@Content TypedValue<InputStream> compressed,
                                           @ParameterDsl(
