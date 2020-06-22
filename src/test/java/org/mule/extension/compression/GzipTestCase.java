@@ -22,27 +22,31 @@ import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import org.mule.extension.compression.api.strategy.gzip.GzipCompressorStrategy;
 import org.mule.extension.compression.api.strategy.gzip.GzipDecompressorStrategy;
 import org.mule.extension.compression.internal.error.exception.InvalidArchiveException;
+import org.mule.extension.compression.internal.gzip.GzipCompressorInputStream;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.Deflater;
 
 import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Issue;
 
 public class GzipTestCase {
-
 
   private static final String GZIP_TEST_FILE_NAME = "file.txt.gz";
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
 
-  private GzipCompressorStrategy compressor = new GzipCompressorStrategy();
-  private GzipDecompressorStrategy decompressor = new GzipDecompressorStrategy();
+  private final GzipCompressorStrategy compressor = new GzipCompressorStrategy();
+  private final GzipDecompressorStrategy decompressor = new GzipDecompressorStrategy();
 
   @Test
   public void compress() {
@@ -81,4 +85,32 @@ public class GzipTestCase {
     TypedValue<InputStream> txtInput = new TypedValue<>(fileTxt, TEXT_STRING);
     decompressor.decompress(txtInput);
   }
+
+  @Test
+  @Issue("COMPM-10")
+  public void compressDeflaterEnded() throws IOException {
+    Deflater deflater;
+    try (final TestGzipCompressorInputStream gzipCompressorInputStream =
+        new TestGzipCompressorInputStream(new ByteArrayInputStream(new byte[] {}))) {
+      deflater = gzipCompressorInputStream.getDeflater();
+    }
+
+    expected.expectMessage("Deflater has been closed");
+    deflater.getBytesRead();
+  }
+
+  private static final class TestGzipCompressorInputStream extends GzipCompressorInputStream {
+
+    private final Deflater deflater;
+
+    private TestGzipCompressorInputStream(InputStream in) {
+      super(in);
+      this.deflater = this.def;
+    }
+
+    public Deflater getDeflater() {
+      return deflater;
+    }
+  }
+
 }
