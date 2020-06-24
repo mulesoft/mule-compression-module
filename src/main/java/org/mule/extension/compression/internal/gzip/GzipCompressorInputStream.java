@@ -6,14 +6,14 @@
  */
 package org.mule.extension.compression.internal.gzip;
 
+import static java.util.zip.Deflater.DEFAULT_COMPRESSION;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterInputStream;
-
-import static java.util.zip.Deflater.DEFAULT_COMPRESSION;
 
 /**
  * Implements an input stream for compressing input data in the GZIP compression format.
@@ -46,7 +46,7 @@ public class GzipCompressorInputStream extends DeflaterInputStream {
   private boolean trailerWritten = false;
 
   // Internal buffer for GZIP header and trailer.
-  private Buffer buffer;
+  private final Buffer buffer;
 
 
   /**
@@ -88,6 +88,7 @@ public class GzipCompressorInputStream extends DeflaterInputStream {
     buffer = new Buffer();
   }
 
+  @Override
   public int read(byte b[], int off, int len) throws IOException {
     // Check if there are bytes left to be read from the internal buffer. This is used to provide the header
     // or trailer, and always takes precedence.
@@ -162,5 +163,12 @@ public class GzipCompressorInputStream extends DeflaterInputStream {
     buf[offset] = (byte) (s & 0xff);
     buf[offset + 1] = (byte) ((s >> 8) & 0xff);
     return 2;
+  }
+
+  @Override
+  public void close() throws IOException {
+    super.close();
+    // Since the deflater is not the default one, it must be closed explicitly
+    def.end();
   }
 }
