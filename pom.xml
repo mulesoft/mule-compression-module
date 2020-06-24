@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.extensions</groupId>
         <artifactId>mule-core-modules-parent</artifactId>
-        <version>1.1.6</version>
+        <version>1.1.7</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -24,10 +24,10 @@
         <munit.input.directory>src/test/munit</munit.input.directory>
         <munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
         <munit.extensions.maven.plugin.version>1.0.0</munit.extensions.maven.plugin.version>
-        <munit.version>2.2.4</munit.version>
+        <munit.version>2.2.5</munit.version>
         <mavenResourcesVersion>3.0.2</mavenResourcesVersion>
-        <commons.compress.version>1.19</commons.compress.version>
-        <commons.lang3.version>3.9</commons.lang3.version>
+        <commons.compress.version>1.20</commons.compress.version>
+        <commons.lang3.version>3.10</commons.lang3.version>
         <javax.jaxb-api.version>2.3.1</javax.jaxb-api.version>
     </properties>
 
