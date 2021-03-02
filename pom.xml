@@ -27,7 +27,7 @@
         <munit.version>2.3.2</munit.version>
         <mavenResourcesVersion>3.2.0</mavenResourcesVersion>
         <commons.compress.version>1.20</commons.compress.version>
-        <commons.lang3.version>3.11</commons.lang3.version>
+        <commons.lang3.version>3.12.0</commons.lang3.version>
         <javax.jaxb-api.version>2.3.1</javax.jaxb-api.version>
     </properties>
 
