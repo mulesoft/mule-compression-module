@@ -77,7 +77,7 @@ public class ZipDecompressorStrategy implements DecompressorStrategy {
     } catch (IOException e) {
       closeQuietly(zip);
       if (e.getCause() instanceof ZipException) {
-        throw new InvalidArchiveException(e);
+        throw new InvalidArchiveException(e.getCause());
       } else {
         throw new DecompressionException(e);
       }
