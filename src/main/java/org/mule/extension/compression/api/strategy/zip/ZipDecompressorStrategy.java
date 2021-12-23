@@ -29,8 +29,8 @@ import java.util.zip.ZipException;
 import javax.inject.Inject;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A Zip decompressor.
@@ -44,7 +44,7 @@ public class ZipDecompressorStrategy implements DecompressorStrategy {
   @Inject
   private CompressionManager compressionManager;
 
-  private final static Logger LOGGER = LoggerFactory.getLogger(ZipDecompressorStrategy.class);
+  private final static Logger LOGGER = getLogger(ZipDecompressorStrategy.class);
 
   /**
    * {@inheritDoc}
