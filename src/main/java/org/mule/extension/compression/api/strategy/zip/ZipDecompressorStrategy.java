@@ -19,6 +19,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -28,6 +29,8 @@ import java.util.zip.ZipException;
 import javax.inject.Inject;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import static org.slf4j.LoggerFactory.getLogger;
+import org.slf4j.Logger;
 
 /**
  * A Zip decompressor.
@@ -40,6 +43,8 @@ public class ZipDecompressorStrategy implements DecompressorStrategy {
 
   @Inject
   private CompressionManager compressionManager;
+
+  private final static Logger LOGGER = getLogger(ZipDecompressorStrategy.class);
 
   /**
    * {@inheritDoc}
@@ -69,11 +74,16 @@ public class ZipDecompressorStrategy implements DecompressorStrategy {
     } catch (ModuleException e) {
       closeQuietly(zip);
       throw e;
-    } catch (ZipException e) {
+    } catch (IOException e) {
       closeQuietly(zip);
-      throw new InvalidArchiveException(e);
+      if (e.getCause() instanceof ZipException) {
+        throw new InvalidArchiveException(e.getCause());
+      } else {
+        throw new DecompressionException(e);
+      }
     } catch (Exception e) {
       closeQuietly(zip);
+      LOGGER.error(e.getMessage(), e);
       throw new DecompressionException(e);
     }
   }
