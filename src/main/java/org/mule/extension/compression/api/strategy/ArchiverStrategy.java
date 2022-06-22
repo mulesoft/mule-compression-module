@@ -6,6 +6,7 @@
  */
 package org.mule.extension.compression.api.strategy;
 
+import org.apache.commons.compress.archivers.zip.Zip64Mode;
 import org.mule.extension.compression.internal.error.exception.CompressionException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -24,5 +25,6 @@ public interface ArchiverStrategy {
    * Receives a map with all the contents that needs to be compressed, creates a new archive with
    * those contents and returns the created archive as an InputStream
    */
-  Result<InputStream, Void> archive(Map<String, TypedValue<InputStream>> entries) throws CompressionException;
+  Result<InputStream, Void> archive(Map<String, TypedValue<InputStream>> entries)
+      throws CompressionException;
 }

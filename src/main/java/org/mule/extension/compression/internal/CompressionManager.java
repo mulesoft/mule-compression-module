@@ -10,6 +10,10 @@ import static java.lang.System.getProperty;
 import static org.mule.extension.compression.internal.CompressionExtension.ZIP_MEDIA_TYPE;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.core.api.util.FileUtils.copyStreamToFile;
+
+import org.apache.commons.compress.archivers.zip.Zip64Mode;
+import org.apache.commons.io.FileUtils;
+import org.mule.extension.compression.api.strategy.zip.SizeChecker;
 import org.mule.extension.compression.internal.error.exception.CompressionException;
 import org.mule.extension.compression.internal.zip.TempZipFile;
 import org.mule.runtime.api.exception.MuleException;
@@ -21,12 +25,7 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.*;
 import java.util.Map;
 import java.util.Random;
 
@@ -64,12 +63,13 @@ public class CompressionManager implements Startable, Stoppable {
     compressionScheduler = null;
   }
 
-  public Result<InputStream, Void> asyncArchive(Map<String, TypedValue<InputStream>> entries) {
+  public Result<InputStream, Void> asyncArchive(Map<String, TypedValue<InputStream>> entries, Boolean forceZip64) {
     try {
+
       PipedInputStream pipe = new PipedInputStream();
       PipedOutputStream out = new PipedOutputStream(pipe);
 
-      compressionScheduler.submit(() -> archive(entries, out));
+      compressionScheduler.submit(() -> archive(entries, out, forceZip64));
 
       return Result.<InputStream, Void>builder()
           .output(pipe)
@@ -107,9 +107,10 @@ public class CompressionManager implements Startable, Stoppable {
    * @param entries the entries to archive
    * @param out     the {@link OutputStream} in which the compressed content is going to be written
    */
-  private void archive(Map<String, TypedValue<InputStream>> entries, OutputStream out) {
+  private void archive(Map<String, TypedValue<InputStream>> entries, OutputStream out, Boolean forceZip64) {
     try (ZipArchiveOutputStream zip = new ZipArchiveOutputStream(out)) {
-      entries.forEach((name, content) -> addEntry(zip, name, content, transformationService));
+      entries.forEach((name, content) -> addEntry(zip, name, content, transformationService, forceZip64));
+
     } catch (IOException e) {
       throw new CompressionException(e);
     }
@@ -118,9 +119,13 @@ public class CompressionManager implements Startable, Stoppable {
   private void addEntry(ZipArchiveOutputStream zip,
                         String name,
                         TypedValue<InputStream> entryContent,
-                        TransformationService transformationService) {
+                        TransformationService transformationService,
+                        boolean forceZip64) {
     try {
       ZipArchiveEntry newEntry = new ZipArchiveEntry(name);
+      if (forceZip64) {
+        zip.setUseZip64(Zip64Mode.Always);
+      }
       zip.putArchiveEntry(newEntry);
 
       byte[] buffer = new byte[1024];

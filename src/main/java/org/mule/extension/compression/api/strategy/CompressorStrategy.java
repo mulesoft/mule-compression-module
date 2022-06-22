@@ -6,6 +6,7 @@
  */
 package org.mule.extension.compression.api.strategy;
 
+import org.apache.commons.compress.archivers.zip.Zip64Mode;
 import org.mule.extension.compression.internal.error.exception.CompressionException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.runtime.operation.Result;

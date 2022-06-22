@@ -7,6 +7,8 @@
 package org.mule.extension.compression.api.strategy.gzip;
 
 import static org.mule.extension.compression.internal.CompressionExtension.GZIP_MEDIA_TYPE;
+
+import org.apache.commons.compress.archivers.zip.Zip64Mode;
 import org.mule.extension.compression.api.strategy.CompressorStrategy;
 import org.mule.extension.compression.internal.error.exception.CompressionException;
 import org.mule.extension.compression.internal.gzip.GzipCompressorInputStream;
