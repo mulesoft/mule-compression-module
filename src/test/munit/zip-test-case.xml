@@ -1,0 +1,189 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns:compression="http://www.mulesoft.org/schema/mule/compression"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+      http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+      http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+      http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd">
+
+    <munit:config name="zip.xml"/>
+
+    <munit:test name="compress-zip">
+        <munit:behavior>
+            <file:read config-ref="test-resources" path="file.txt"/>
+            <set-variable variableName="fileTxtSize" value="#[attributes.size]"/>
+            <set-variable variableName="fileTxt" value="#[payload]"/>
+        </munit:behavior>
+        <munit:execution>
+            <compression:compress>
+                <compression:content>#[vars.fileTxt]</compression:content>
+                <compression:compressor>
+                    <compression:zip-compressor/>
+                </compression:compressor>
+            </compression:compress>
+            <set-variable variableName="compressed" value="#[payload]"/>
+            <file:write config-ref="tmp-dir" path="file-txt.zip"/>
+            <file:read config-ref="tmp-dir" path="file-txt.zip"/>
+            <set-variable variableName="compressedFileSize" value="#[attributes.size]"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.fileTxtSize]" is="#[MunitTools::greaterThan(vars.compressedFileSize)]"/>
+            <munit-tools:assert-that expression="#[vars.compressed]" is="#[MunitTools::withMediaType('application/zip')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="decompress-zip">
+        <munit:behavior>
+            <file:read config-ref="test-resources" path="file.txt.zip"/>
+        </munit:behavior>
+        <munit:execution>
+            <compression:decompress outputMimeType="text/plain">
+                <compression:decompressor>
+                    <compression:zip-decompressor/>
+                </compression:decompressor>
+            </compression:decompress>
+        </munit:execution>
+        <munit:validation>
+                <munit-tools:assert-that  expression="#[payload]" is="#[MunitTools::equalTo( readUrl('classpath://file.txt', 'text/plain') replace '\r' with(''))]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="bigContentRoundtrip">
+        <munit:behavior>
+            <set-variable variableName="payloadSize" value="#[output application/java --- 100 * 1024 * 1024]" />
+            <set-variable variableName="bigContent"
+                          value="#[java!org::mule::extension::compression::TestUtils::inputStream(vars.payloadSize)]"/>
+        </munit:behavior>
+        <munit:execution>
+            <compression:compress>
+                <non-repeatable-stream/>
+                <compression:content>#[vars.bigContent]</compression:content>
+                <compression:compressor>
+                    <compression:zip-compressor/>
+                </compression:compressor>
+            </compression:compress>
+            <compression:decompress outputMimeType="text/plain">
+                <non-repeatable-stream/>
+                <compression:decompressor>
+                    <compression:zip-decompressor/>
+                </compression:decompressor>
+            </compression:decompress>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[output application/java --- sizeOf(payload)]" is="#[MunitTools::equalTo(vars.payloadSize)]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="archive">
+        <munit:behavior >
+            <file:read config-ref="test-resources" path="file.txt" target="entry1" outputMimeType="text/plain"/>
+            <file:read config-ref="test-resources" path="file.txt" target="entry2" outputMimeType="text/plain"/>
+        </munit:behavior>
+        <munit:execution>
+            <compression:archive>
+                <compression:entries>
+                #[
+                {
+                    'txt': vars.entry1,
+                    'dir/txt': vars.entry2
+                }
+                ]
+                </compression:entries>
+                <compression:archiver>
+                    <compression:zip-archiver/>
+                </compression:archiver>
+            </compression:archive>
+            <file:write config-ref="tmp-dir" path="twoEntry.zip"/>
+            <file:read config-ref="tmp-dir" path="twoEntry.zip"/>
+            <set-variable variableName="compressedFileSize" value="#[attributes.size]"/>
+        </munit:execution>
+        <munit:validation>
+            <file:read config-ref="test-resources" path="file.txt" target="fileTxtSize" targetValue="#[attributes.size]"/>
+            <munit-tools:assert>
+                <munit-tools:that>
+                    #[
+                        import * from dw::test::Asserts
+                        ---
+                        (vars.fileTxtSize * 2) must beGreaterThan(vars.compressedFileSize)
+                    ]
+                </munit-tools:that>
+            </munit-tools:assert>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::withMediaType('application/zip')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="extract">
+        <munit:behavior>
+            <file:read config-ref="test-resources" path="archive.zip" target="archive"/>
+        </munit:behavior>
+        <munit:execution>
+            <compression:extract>
+                <compression:compressed>#[vars.archive]</compression:compressed>
+                <compression:extractor>
+                    <compression:zip-extractor/>
+                </compression:extractor>
+            </compression:extract>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[output application/java --- sizeOf(payload)]" is="#[MunitTools::equalTo(2)]"/>
+            <munit-tools:assert-that expression="#[output text/plain --- payload['file.txt']]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain') replace '\r' with(''))]"/>
+            <munit-tools:assert-that expression="#[output text/plain --- payload['dir/in-dir.txt']]" is="#[MunitTools::equalTo('This is the content of a file inside a directory in a zip')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="repeatableExtract">
+        <munit:behavior>
+            <file:read config-ref="test-resources" path="archive.zip" target="archive"/>
+        </munit:behavior>
+        <munit:execution>
+            <compression:extract>
+                <compression:compressed>#[vars.archive]</compression:compressed>
+                <compression:extractor>
+                    <compression:zip-extractor/>
+                </compression:extractor>
+            </compression:extract>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[output application/java --- sizeOf(payload)]" is="#[MunitTools::equalTo(2)]"/>
+
+            <!-- Do all assertions twice to validate that the streams are repeatable -->
+
+            <munit-tools:assert-that expression="#[output text/plain --- payload['file.txt']]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain') replace '\r' with(''))]"/>
+            <munit-tools:assert-that expression="#[output text/plain --- payload['file.txt']]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain') replace '\r' with(''))]"/>
+
+            <munit-tools:assert-that expression="#[output text/plain --- payload['dir/in-dir.txt']]" is="#[MunitTools::equalTo('This is the content of a file inside a directory in a zip')]"/>
+            <munit-tools:assert-that expression="#[output text/plain --- payload['dir/in-dir.txt']]" is="#[MunitTools::equalTo('This is the content of a file inside a directory in a zip')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="readCompressExtract">
+        <munit:behavior>
+            <file:read config-ref="test-resources" path="file.txt" target="fileTxt"/>
+        </munit:behavior>
+        <munit:execution>
+            <compression:compress>
+                <compression:content>#[vars.fileTxt]</compression:content>
+                <compression:compressor>
+                    <compression:zip-compressor/>
+                </compression:compressor>
+            </compression:compress>
+            <file:write config-ref="tmp-dir" path="file-txt.zip"/>
+            <file:read config-ref="tmp-dir" path="file-txt.zip"/>
+            <compression:extract>
+                <compression:extractor>
+                    <compression:zip-extractor/>
+                </compression:extractor>
+            </compression:extract>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[output text/plain --- payload.data]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain'))]"/>
+        </munit:validation>
+    </munit:test>
+
+
+
+</mule>
