@@ -18,6 +18,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -66,9 +67,13 @@ public class ZipExtractorStrategy implements ExtractorStrategy {
     } catch (ModuleException e) {
       closeQuietly(zip);
       throw e;
-    } catch (ZipException e) {
+    } catch (IOException e) {
       closeQuietly(zip);
-      throw new InvalidArchiveException(e);
+      if (e.getCause() instanceof ZipException) {
+        throw new InvalidArchiveException(e.getCause());
+      } else {
+        throw new DecompressionException(e);
+      }
     } catch (Exception e) {
       closeQuietly(zip);
       throw new DecompressionException(e);
