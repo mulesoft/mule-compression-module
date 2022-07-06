@@ -6,18 +6,15 @@
  */
 package org.mule.extension.compression.api.strategy.zip;
 
-import static java.util.Collections.singletonMap;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static java.util.Collections.singletonMap;
 
-import org.apache.commons.compress.archivers.zip.Zip64Mode;
 import org.mule.extension.compression.api.strategy.CompressorStrategy;
 import org.mule.extension.compression.internal.CompressionManager;
 import org.mule.extension.compression.internal.error.exception.CompressionException;
-import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;

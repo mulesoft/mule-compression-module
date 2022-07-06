@@ -6,7 +6,8 @@
  */
 package org.mule.extension.compression.api.strategy.zip;
 
-import org.apache.commons.compress.archivers.zip.Zip64Mode;
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+
 import org.mule.extension.compression.api.strategy.ArchiverStrategy;
 import org.mule.extension.compression.internal.CompressionManager;
 import org.mule.extension.compression.internal.error.exception.CompressionException;
@@ -22,8 +23,6 @@ import java.io.InputStream;
 import java.util.Map;
 
 import javax.inject.Inject;
-
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 
 /**
  * Zip format archiver
@@ -47,8 +46,7 @@ public class ZipArchiverStrategy implements ArchiverStrategy {
    * {@inheritDoc}
    */
   @Override
-  public Result<InputStream, Void> archive(Map<String, TypedValue<InputStream>> entries)
-      throws CompressionException {
+  public Result<InputStream, Void> archive(Map<String, TypedValue<InputStream>> entries) {
     return compressionManager.asyncArchive(entries, forceZip64);
   }
 
