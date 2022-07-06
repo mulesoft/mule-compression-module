@@ -16,7 +16,7 @@ import java.io.InputStream;
  */
 public class CustomSizeInputStream extends InputStream {
 
-  long size;
+  private long size;
 
   public CustomSizeInputStream(long size) {
     this.size = size;
