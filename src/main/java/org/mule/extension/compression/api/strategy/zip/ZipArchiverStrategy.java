@@ -10,7 +10,6 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 
 import org.mule.extension.compression.api.strategy.ArchiverStrategy;
 import org.mule.extension.compression.internal.CompressionManager;
-import org.mule.extension.compression.internal.error.exception.CompressionException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;

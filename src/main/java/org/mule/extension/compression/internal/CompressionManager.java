@@ -6,10 +6,10 @@
  */
 package org.mule.extension.compression.internal;
 
-import static org.mule.extension.compression.internal.CompressionExtension.ZIP_MEDIA_TYPE;
-import static org.mule.runtime.core.api.util.FileUtils.copyStreamToFile;
-import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static java.lang.System.getProperty;
+import static org.mule.extension.compression.internal.CompressionExtension.ZIP_MEDIA_TYPE;
+import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
+import static org.mule.runtime.core.api.util.FileUtils.copyStreamToFile;
 
 import org.mule.extension.compression.internal.error.exception.CompressionException;
 import org.mule.extension.compression.internal.zip.TempZipFile;
@@ -22,7 +22,12 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.Map;
 import java.util.Random;
 
@@ -62,7 +67,6 @@ public class CompressionManager implements Startable, Stoppable {
 
   public Result<InputStream, Void> asyncArchive(Map<String, TypedValue<InputStream>> entries, Boolean forceZip64) {
     try {
-
       PipedInputStream pipe = new PipedInputStream();
       PipedOutputStream out = new PipedOutputStream(pipe);
 
@@ -107,7 +111,6 @@ public class CompressionManager implements Startable, Stoppable {
   private void archive(Map<String, TypedValue<InputStream>> entries, OutputStream out, Boolean forceZip64) {
     try (ZipArchiveOutputStream zip = new ZipArchiveOutputStream(out)) {
       entries.forEach((name, content) -> addEntry(zip, name, content, transformationService, forceZip64));
-
     } catch (IOException e) {
       throw new CompressionException(e);
     }

@@ -7,7 +7,8 @@
 package org.mule.extension.compression;
 
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
-import static java.lang.Thread.*;
+import static org.hamcrest.Matchers.lessThan;
+import static org.junit.Assert.assertThat;
 
 import org.mule.extension.compression.api.strategy.zip.ZipArchiverStrategy;
 import org.mule.extension.compression.api.strategy.zip.ZipCompressorStrategy;
@@ -26,6 +27,9 @@ import org.junit.rules.ExpectedException;
 import com.google.common.collect.ImmutableMap;
 
 public class Zip64ModeTests extends FunctionalTestCase {
+
+  private static final long AMOUNT_OF_BYTES_GREATER_THAN_4GB = 4295709120L;
+  private static final int AMOUNT_OF_BYTES_IN_1GB = 1073741824;
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
@@ -59,29 +63,46 @@ public class Zip64ModeTests extends FunctionalTestCase {
     Result<InputStream, Void> compress = archiver.archive(testEntries);
 
     InputStream output = compress.getOutput();
-    consumeOutput(output);
-    //TODO - Fix error handling in CompressionManager and add the following lines:
-    // ----
-    // expected.expect(CompressionException.class);
-    // expected.expectMessage("Unexpected error occur while trying to compress: data1's size exceeds the limit of 4GByte.");
+    consumeOutputAndReturnSize(output);
+    //TODO - Fix error handling in CompressionManager (W-11390500) and add the following lines:
+    //expected.expect(CompressionException.class);
+    //expected.expectMessage("Unexpected error occur while trying to compress: data1's size exceeds the limit of 4GByte.");
+  }
+
+  @Test
+  public void archiveInputStreamGreaterThan4GBForceZIP64() throws IOException {
+
+    archiver.setForceZip64(true);
+    Map<String, TypedValue<InputStream>> testEntries = getTestEntries();
+    Result<InputStream, Void> compress = archiver.archive(testEntries);
+
+    InputStream output = compress.getOutput();
+    assertThat(consumeOutputAndReturnSize(output), lessThan(AMOUNT_OF_BYTES_IN_1GB));
   }
 
   /**
-   * This method receive an inputStream, and consume all bytes without any action,
+   * This method receive an inputStream, consume all bytes and calculate the total amount,
    * is necessary to get an error for test
    */
-  private void consumeOutput(InputStream is) throws IOException {
+  private int consumeOutputAndReturnSize(InputStream is) throws IOException {
     int chunk = 0;
+    int size = 0;
     byte[] buffer = new byte[1024];
-    while ((chunk = is.read(buffer)) != -1);
+    while ((chunk = is.read(buffer)) != -1) {
+      size++;
+    }
+    return size;
   }
 
   private Map<String, TypedValue<InputStream>> getTestEntries() {
-    CustomSizeInputStream inputStream = new CustomSizeInputStream(4295709120L);
-    TypedValue<InputStream> testInput = new TypedValue<>(inputStream, INPUT_STREAM);
-
     return ImmutableMap.<String, TypedValue<InputStream>>builder()
-        .put("data1", testInput)
+        .put("data1", getEntry())
         .build();
+  }
+
+  private TypedValue<InputStream> getEntry() {
+    CustomSizeInputStream inputStream = new CustomSizeInputStream(AMOUNT_OF_BYTES_GREATER_THAN_4GB);
+    TypedValue<InputStream> testInput = new TypedValue<>(inputStream, INPUT_STREAM);
+    return testInput;
   }
 }
