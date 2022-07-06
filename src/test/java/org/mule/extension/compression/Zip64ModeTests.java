@@ -6,8 +6,8 @@
  */
 package org.mule.extension.compression;
 
-import static java.lang.Thread.*;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
+import static java.lang.Thread.*;
 
 import org.mule.extension.compression.api.strategy.zip.ZipArchiverStrategy;
 import org.mule.extension.compression.api.strategy.zip.ZipCompressorStrategy;
@@ -25,16 +25,15 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import com.google.common.collect.ImmutableMap;
 
-
 public class Zip64ModeTests extends FunctionalTestCase {
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
 
-  private ZipCompressorStrategy compressor = new ZipCompressorStrategy();
   private ZipArchiverStrategy archiver = new ZipArchiverStrategy();
-  private ZipDecompressorStrategy decompressor = new ZipDecompressorStrategy();
   private ZipExtractorStrategy extractor = new ZipExtractorStrategy();
+  private ZipCompressorStrategy compressor = new ZipCompressorStrategy();
+  private ZipDecompressorStrategy decompressor = new ZipDecompressorStrategy();
 
   @Override
   protected String[] getConfigFiles() {
@@ -43,10 +42,10 @@ public class Zip64ModeTests extends FunctionalTestCase {
 
   @Override
   protected void doSetUp() throws Exception {
-    muleContext.getInjector().inject(compressor);
-    muleContext.getInjector().inject(decompressor);
     muleContext.getInjector().inject(archiver);
     muleContext.getInjector().inject(extractor);
+    muleContext.getInjector().inject(compressor);
+    muleContext.getInjector().inject(decompressor);
   }
 
   @Before
@@ -60,23 +59,15 @@ public class Zip64ModeTests extends FunctionalTestCase {
     Result<InputStream, Void> compress = archiver.archive(testEntries);
 
     InputStream output = compress.getOutput();
-
-    printThreads();
     consumeOutput(output);
-
-  }
-
-  private void printThreads() {
-    Thread[] threads = new Thread[activeCount()];
-    enumerate(threads);
-
-    for (Thread thread : threads) {
-      System.out.println(thread.getName());
-    }
+    //TODO - Fix error handling in CompressionManager and add the following lines:
+    // ----
+    // expected.expect(CompressionException.class);
+    // expected.expectMessage("Unexpected error occur while trying to compress: data1's size exceeds the limit of 4GByte.");
   }
 
   /**
-   * This class receive an inputStream, and consume all bytes without any action,
+   * This method receive an inputStream, and consume all bytes without any action,
    * is necessary to get an error for test
    */
   private void consumeOutput(InputStream is) throws IOException {
@@ -86,7 +77,7 @@ public class Zip64ModeTests extends FunctionalTestCase {
   }
 
   private Map<String, TypedValue<InputStream>> getTestEntries() {
-    FakeInputStream inputStream = new FakeInputStream(4295709120L);
+    CustomSizeInputStream inputStream = new CustomSizeInputStream(4295709120L);
     TypedValue<InputStream> testInput = new TypedValue<>(inputStream, INPUT_STREAM);
 
     return ImmutableMap.<String, TypedValue<InputStream>>builder()

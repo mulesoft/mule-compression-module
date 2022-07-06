@@ -6,14 +6,11 @@
  */
 package org.mule.extension.compression.internal;
 
-import static java.lang.System.getProperty;
 import static org.mule.extension.compression.internal.CompressionExtension.ZIP_MEDIA_TYPE;
-import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.core.api.util.FileUtils.copyStreamToFile;
+import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
+import static java.lang.System.getProperty;
 
-import org.apache.commons.compress.archivers.zip.Zip64Mode;
-import org.apache.commons.io.FileUtils;
-import org.mule.extension.compression.api.strategy.zip.SizeChecker;
 import org.mule.extension.compression.internal.error.exception.CompressionException;
 import org.mule.extension.compression.internal.zip.TempZipFile;
 import org.mule.runtime.api.exception.MuleException;
@@ -30,9 +27,9 @@ import java.util.Map;
 import java.util.Random;
 
 import javax.inject.Inject;
-
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.compress.archivers.zip.Zip64Mode;
 
 /**
  * Manages resources necessary for performing compression operations

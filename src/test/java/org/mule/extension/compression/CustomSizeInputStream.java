@@ -9,19 +9,21 @@ package org.mule.extension.compression;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Random;
 
-public class FakeInputStream extends InputStream {
+/**
+ * The purpose of this class is returns integer in the read() method,
+ * as many times as indicated in the constructor at the moment of the instance.
+ */
+public class CustomSizeInputStream extends InputStream {
 
   long size;
-  final Random random = new Random();
 
-  public FakeInputStream(long size) {
+  public CustomSizeInputStream(long size) {
     this.size = size;
   }
 
   @Override
-  public int read() throws IOException {
+  public int read() {
     if (size > 0) {
       size--;
       return 5;
