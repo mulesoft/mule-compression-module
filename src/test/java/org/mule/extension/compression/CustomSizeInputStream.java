@@ -18,6 +18,7 @@ import java.io.InputStream;
 public class CustomSizeInputStream extends InputStream {
 
   private long size;
+  private static final int ANY_NUMBER = 5;
 
   public CustomSizeInputStream(long size) {
     this.size = size;
@@ -27,7 +28,7 @@ public class CustomSizeInputStream extends InputStream {
   public int read() {
     if (size > 0) {
       size--;
-      return 5;
+      return ANY_NUMBER;
     } else {
       return -1;
     }
