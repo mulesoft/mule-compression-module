@@ -52,9 +52,6 @@ public class Zip64ModeTests extends FunctionalTestCase {
     muleContext.getInjector().inject(decompressor);
   }
 
-  @Before
-  public void setup() {}
-
   @Test
   public void archiveInputStreamGreaterThan4GBNotForceZIP64() throws Exception {
 

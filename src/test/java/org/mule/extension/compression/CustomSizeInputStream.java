@@ -7,12 +7,13 @@
 
 package org.mule.extension.compression;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
  * The purpose of this class is returns integer in the read() method,
  * as many times as indicated in the constructor at the moment of the instance.
+ *
+ *  * @since 2.2.0
  */
 public class CustomSizeInputStream extends InputStream {
 
