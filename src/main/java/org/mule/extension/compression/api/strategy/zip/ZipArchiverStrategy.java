@@ -6,10 +6,15 @@
  */
 package org.mule.extension.compression.api.strategy.zip;
 
+import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+
 import org.mule.extension.compression.api.strategy.ArchiverStrategy;
 import org.mule.extension.compression.internal.CompressionManager;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -30,11 +35,25 @@ public class ZipArchiverStrategy implements ArchiverStrategy {
   @Inject
   private CompressionManager compressionManager;
 
+  @Parameter
+  @DisplayName("Force ZIP64")
+  @Optional(defaultValue = "false")
+  @Expression(NOT_SUPPORTED)
+  boolean forceZip64;
+
   /**
    * {@inheritDoc}
    */
   @Override
   public Result<InputStream, Void> archive(Map<String, TypedValue<InputStream>> entries) {
-    return compressionManager.asyncArchive(entries);
+    return compressionManager.asyncArchive(entries, forceZip64);
+  }
+
+  public boolean isForceZip64() {
+    return forceZip64;
+  }
+
+  public void setForceZip64(boolean forceZip64) {
+    this.forceZip64 = forceZip64;
   }
 }
