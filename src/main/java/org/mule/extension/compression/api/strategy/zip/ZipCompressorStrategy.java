@@ -6,17 +6,12 @@
  */
 package org.mule.extension.compression.api.strategy.zip;
 
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static java.util.Collections.singletonMap;
-
 import org.mule.extension.compression.api.strategy.CompressorStrategy;
 import org.mule.extension.compression.internal.CompressionManager;
 import org.mule.extension.compression.internal.error.exception.CompressionException;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
@@ -36,25 +31,11 @@ public class ZipCompressorStrategy implements CompressorStrategy {
   @Inject
   private CompressionManager compressionManager;
 
-  @Parameter
-  @DisplayName("Force ZIP64")
-  @Optional(defaultValue = "false")
-  @Expression(NOT_SUPPORTED)
-  boolean forceZip64;
-
   /**
    * {@inheritDoc}
    */
   @Override
   public Result<InputStream, Void> compress(TypedValue<InputStream> data) throws CompressionException {
-    return compressionManager.asyncArchive(singletonMap("data", data), forceZip64);
-  }
-
-  public boolean isForceZip64() {
-    return forceZip64;
-  }
-
-  public void setForceZip64(boolean forceZip64) {
-    this.forceZip64 = forceZip64;
+    return compressionManager.asyncArchive(singletonMap("data", data));
   }
 }
