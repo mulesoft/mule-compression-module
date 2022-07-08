@@ -35,6 +35,9 @@ public class ZipArchiverStrategy implements ArchiverStrategy {
   @Inject
   private CompressionManager compressionManager;
 
+  /**
+   * Enables you to archive files and byte arrays greater than 4 GB.
+   */
   @Parameter
   @DisplayName("Force ZIP64")
   @Optional(defaultValue = "false")
