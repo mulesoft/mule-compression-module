@@ -204,6 +204,33 @@ public class CompressionManager implements Startable, Stoppable {
       }
     }
 
+    @Override
+    public int read(byte[] b) throws IOException {
+      if (exception.get() != null) {
+        System.out.println("READ have to throw exception");
+        throw exception.get();
+      }
+      return super.read(b);
+    }
+
+    @Override
+    public synchronized int read() throws IOException {
+      if (exception.get() != null) {
+        System.out.println("READ have to throw exception");
+        throw exception.get();
+      }
+      return super.read();
+    }
+
+    @Override
+    public synchronized int read(byte[] b, int off, int len) throws IOException {
+      if (exception.get() != null) {
+        System.out.println("READ have to throw exception");
+        throw exception.get();
+      }
+      return super.read(b, off, len);
+    }
+
     public void fail(final IOException e) {
       exception.set(e);
     }
