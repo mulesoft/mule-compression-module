@@ -11,6 +11,7 @@ import static org.mule.extension.compression.internal.CompressionExtension.ZIP_M
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.core.api.util.FileUtils.copyStreamToFile;
 
+import com.google.common.base.Preconditions;
 import org.mule.extension.compression.internal.error.exception.CompressionException;
 import org.mule.extension.compression.internal.zip.TempZipFile;
 import org.mule.runtime.api.exception.MuleException;
@@ -22,19 +23,24 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.*;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
+import javax.print.attribute.standard.Compression;
+
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.Zip64Mode;
+import org.scalactic.Bool;
 
 /**
  * Manages resources necessary for performing compression operations
@@ -67,13 +73,23 @@ public class CompressionManager implements Startable, Stoppable {
 
   public Result<InputStream, Void> asyncArchive(Map<String, TypedValue<InputStream>> entries, Boolean forceZip64) {
     try {
-      PipedInputStream pipe = new PipedInputStream();
-      PipedOutputStream out = new PipedOutputStream(pipe);
+      //  PipedInputStream in = new PipedInputStream();
+      InputStreamWithFinalExceptionCheck inWithException = new InputStreamWithFinalExceptionCheck();
+      PipedOutputStream out = new PipedOutputStream(inWithException);
 
-      compressionScheduler.submit(() -> archive(entries, out, forceZip64));
+      compressionScheduler.submit(() -> {
+        try {
+          archive(entries, out, forceZip64);
+        } catch (CompressionException e) {
+          System.out.println("catch a exception");
+          inWithException.fail(new IOException(e.getMessage()));
+        } finally {
+          inWithException.countDown();
+        }
+      });
 
       return Result.<InputStream, Void>builder()
-          .output(pipe)
+          .output(inWithException)
           .mediaType(ZIP_MEDIA_TYPE)
           .build();
     } catch (CompressionException e) {
@@ -108,11 +124,17 @@ public class CompressionManager implements Startable, Stoppable {
    * @param entries the entries to archive
    * @param out     the {@link OutputStream} in which the compressed content is going to be written
    */
-  private void archive(Map<String, TypedValue<InputStream>> entries, OutputStream out, Boolean forceZip64) {
+  private void archive(Map<String, TypedValue<InputStream>> entries, OutputStream out, Boolean forceZip64)
+      throws CompressionException {
     try (ZipArchiveOutputStream zip = new ZipArchiveOutputStream(out)) {
-      entries.forEach((name, content) -> addEntry(zip, name, content, transformationService, forceZip64));
-    } catch (IOException e) {
-      throw new CompressionException(e);
+
+      Set<String> strings = entries.keySet();
+      for (String key : strings) {
+        addEntry(zip, key, entries.get(key), transformationService, forceZip64);
+      }
+
+    } catch (Exception e) {
+      throw new CompressionException(e.getCause());
     }
   }
 
@@ -120,14 +142,15 @@ public class CompressionManager implements Startable, Stoppable {
                         String name,
                         TypedValue<InputStream> entryContent,
                         TransformationService transformationService,
-                        boolean forceZip64) {
+                        boolean forceZip64)
+      throws IOException {
     try {
       ZipArchiveEntry newEntry = new ZipArchiveEntry(name);
       if (forceZip64) {
         zip.setUseZip64(Zip64Mode.Always);
       }
       zip.putArchiveEntry(newEntry);
-
+      System.out.println("dentro de schedyler" + Thread.currentThread().getName());
       byte[] buffer = new byte[1024];
       int length;
       InputStream content = getContent(name, entryContent, transformationService);
@@ -153,4 +176,40 @@ public class CompressionManager implements Startable, Stoppable {
     }
   }
 
+  private static final class InputStreamWithFinalExceptionCheck extends PipedInputStream {
+
+    private final AtomicReference<IOException> exception = new AtomicReference<>(null);
+    private final CountDownLatch complete = new CountDownLatch(1);
+
+    @Override
+    public void close() throws IOException {
+
+      System.out.println("override close method executed");
+      try {
+        complete.await();
+
+        System.out.println("complete.await() finished");
+
+        System.out.println(Thread.currentThread().getName());
+        System.out.println(Thread.currentThread().getPriority());
+        System.out.println(Thread.currentThread().getContextClassLoader().getClass().getSimpleName());
+
+        final IOException e = exception.get();
+        if (e != null) {
+          System.out.println("have to throw exception");
+          throw e;
+        }
+      } catch (final InterruptedException e) {
+        throw new IOException("Interrupted while waiting for synchronised closure");
+      }
+    }
+
+    public void fail(final IOException e) {
+      exception.set(e);
+    }
+
+    public void countDown() {
+      complete.countDown();
+    }
+  }
 }

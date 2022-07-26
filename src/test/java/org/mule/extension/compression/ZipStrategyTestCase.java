@@ -33,6 +33,7 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
@@ -80,7 +81,7 @@ public class ZipStrategyTestCase extends FunctionalTestCase {
   }
 
   @Test
-  public void archive() {
+  public void archive() throws IOException {
     Map<String, TypedValue<InputStream>> testEntries = getTestEntries();
     Result<InputStream, Void> compress = archiver.archive(testEntries);
     byte[] zipBytes = toByteArray(compress.getOutput());

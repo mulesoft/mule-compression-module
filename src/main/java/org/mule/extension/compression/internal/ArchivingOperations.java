@@ -25,6 +25,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.StreamingHelper;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
@@ -67,10 +68,16 @@ public class ArchivingOperations {
   @Throws(ArchiveErrorProvider.class)
   public Result<InputStream, Void> archive(@Content Map<String, TypedValue<InputStream>> entries,
                                            @ParameterDsl(
-                                               allowReferences = false) @Expression(NOT_SUPPORTED) ArchiverStrategy archiver) {
+                                               allowReferences = false) @Expression(NOT_SUPPORTED) ArchiverStrategy archiver)
+      throws IOException {
     if (entries == null) {
       throw new CompressionException("the entries parameter is null");
     }
+
+    System.out.println("main");
+    System.out.println(Thread.currentThread().getPriority());
+    System.out.println(Thread.currentThread().getName());
+
     return archiver.archive(entries);
   }
 
