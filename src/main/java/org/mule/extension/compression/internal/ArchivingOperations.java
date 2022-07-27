@@ -68,16 +68,10 @@ public class ArchivingOperations {
   @Throws(ArchiveErrorProvider.class)
   public Result<InputStream, Void> archive(@Content Map<String, TypedValue<InputStream>> entries,
                                            @ParameterDsl(
-                                               allowReferences = false) @Expression(NOT_SUPPORTED) ArchiverStrategy archiver)
-      throws IOException {
+                                               allowReferences = false) @Expression(NOT_SUPPORTED) ArchiverStrategy archiver) throws IOException {
     if (entries == null) {
       throw new CompressionException("the entries parameter is null");
     }
-
-    System.out.println("main");
-    System.out.println(Thread.currentThread().getPriority());
-    System.out.println(Thread.currentThread().getName());
-
     return archiver.archive(entries);
   }
 

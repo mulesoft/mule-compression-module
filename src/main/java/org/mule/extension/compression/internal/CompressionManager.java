@@ -11,7 +11,6 @@ import static org.mule.extension.compression.internal.CompressionExtension.ZIP_M
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.core.api.util.FileUtils.copyStreamToFile;
 
-import com.google.common.base.Preconditions;
 import org.mule.extension.compression.internal.error.exception.CompressionException;
 import org.mule.extension.compression.internal.zip.TempZipFile;
 import org.mule.runtime.api.exception.MuleException;
@@ -23,24 +22,21 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
-import javax.print.attribute.standard.Compression;
-
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.Zip64Mode;
-import org.scalactic.Bool;
 
 /**
  * Manages resources necessary for performing compression operations
@@ -73,18 +69,14 @@ public class CompressionManager implements Startable, Stoppable {
 
   public Result<InputStream, Void> asyncArchive(Map<String, TypedValue<InputStream>> entries, Boolean forceZip64) {
     try {
-      //  PipedInputStream in = new PipedInputStream();
-      InputStreamWithFinalExceptionCheck inWithException = new InputStreamWithFinalExceptionCheck();
+      PipedInputStreamWithFinalExceptionCheck inWithException = new PipedInputStreamWithFinalExceptionCheck();
       PipedOutputStream out = new PipedOutputStream(inWithException);
 
       compressionScheduler.submit(() -> {
         try {
           archive(entries, out, forceZip64);
         } catch (CompressionException e) {
-          System.out.println("catch a exception");
           inWithException.fail(new IOException(e.getMessage()));
-        } finally {
-          inWithException.countDown();
         }
       });
 
@@ -142,15 +134,13 @@ public class CompressionManager implements Startable, Stoppable {
                         String name,
                         TypedValue<InputStream> entryContent,
                         TransformationService transformationService,
-                        boolean forceZip64)
-      throws IOException {
+                        boolean forceZip64) {
     try {
       ZipArchiveEntry newEntry = new ZipArchiveEntry(name);
       if (forceZip64) {
         zip.setUseZip64(Zip64Mode.Always);
       }
       zip.putArchiveEntry(newEntry);
-      System.out.println("dentro de schedyler" + Thread.currentThread().getName());
       byte[] buffer = new byte[1024];
       int length;
       InputStream content = getContent(name, entryContent, transformationService);
@@ -176,15 +166,13 @@ public class CompressionManager implements Startable, Stoppable {
     }
   }
 
-  private static final class InputStreamWithFinalExceptionCheck extends PipedInputStream {
+  private static final class PipedInputStreamWithFinalExceptionCheck extends PipedInputStream {
 
     private final AtomicReference<IOException> exception = new AtomicReference<>(null);
-    private final CountDownLatch complete = new CountDownLatch(1);
 
     @Override
     public int read(byte[] b) throws IOException {
       if (exception.get() != null) {
-        System.out.println("READ have to throw exception");
         throw exception.get();
       }
       return super.read(b);
@@ -193,7 +181,6 @@ public class CompressionManager implements Startable, Stoppable {
     @Override
     public synchronized int read() throws IOException {
       if (exception.get() != null) {
-        System.out.println("READ have to throw exception");
         throw exception.get();
       }
       return super.read();
@@ -202,7 +189,6 @@ public class CompressionManager implements Startable, Stoppable {
     @Override
     public synchronized int read(byte[] b, int off, int len) throws IOException {
       if (exception.get() != null) {
-        System.out.println("READ have to throw exception");
         throw exception.get();
       }
       return super.read(b, off, len);
@@ -210,10 +196,6 @@ public class CompressionManager implements Startable, Stoppable {
 
     public void fail(final IOException e) {
       exception.set(e);
-    }
-
-    public void countDown() {
-      complete.countDown();
     }
   }
 }
