@@ -182,29 +182,6 @@ public class CompressionManager implements Startable, Stoppable {
     private final CountDownLatch complete = new CountDownLatch(1);
 
     @Override
-    public void close() throws IOException {
-
-      System.out.println("override close method executed");
-      try {
-        complete.await();
-
-        System.out.println("complete.await() finished");
-
-        System.out.println(Thread.currentThread().getName());
-        System.out.println(Thread.currentThread().getPriority());
-        System.out.println(Thread.currentThread().getContextClassLoader().getClass().getSimpleName());
-
-        final IOException e = exception.get();
-        if (e != null) {
-          System.out.println("have to throw exception");
-          throw e;
-        }
-      } catch (final InterruptedException e) {
-        throw new IOException("Interrupted while waiting for synchronised closure");
-      }
-    }
-
-    @Override
     public int read(byte[] b) throws IOException {
       if (exception.get() != null) {
         System.out.println("READ have to throw exception");

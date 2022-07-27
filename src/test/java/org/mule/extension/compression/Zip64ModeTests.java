@@ -88,16 +88,13 @@ public class Zip64ModeTests extends FunctionalTestCase {
    * This method receive an inputStream, consume all bytes and calculate the total amount,
    * is necessary to get an error for test
    */
-  private int consumeOutputAndReturnSize(InputStream is) throws IOException, InterruptedException {
+  private int consumeOutputAndReturnSize(InputStream is) throws IOException {
 
-    int chunk = 0;
     int size = 0;
-    byte[] buffer = new byte[1024];
-    while ((chunk = is.read(buffer)) != -1) {
+    while ((is.read()) != -1) {
       size++;
     }
     is.close();
-
     return size;
   }
 
