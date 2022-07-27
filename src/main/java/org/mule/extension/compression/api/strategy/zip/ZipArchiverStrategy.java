@@ -6,7 +6,6 @@
  */
 package org.mule.extension.compression.api.strategy.zip;
 
-import static org.mule.extension.compression.internal.CompressionExtension.ZIP_MEDIA_TYPE;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 
 import org.mule.extension.compression.api.strategy.ArchiverStrategy;
@@ -19,9 +18,6 @@ import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
