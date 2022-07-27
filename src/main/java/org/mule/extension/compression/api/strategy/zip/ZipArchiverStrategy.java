@@ -52,7 +52,7 @@ public class ZipArchiverStrategy implements ArchiverStrategy {
    * {@inheritDoc}
    */
   @Override
-  public Result<InputStream, Void> archive(Map<String, TypedValue<InputStream>> entries) throws IOException {
+  public Result<InputStream, Void> archive(Map<String, TypedValue<InputStream>> entries) {
     return compressionManager.asyncArchive(entries, forceZip64);
   }
 
