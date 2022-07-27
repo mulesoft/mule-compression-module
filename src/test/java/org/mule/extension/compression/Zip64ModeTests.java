@@ -7,13 +7,10 @@
 package org.mule.extension.compression;
 
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
-import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertThat;
 
 import org.mule.extension.compression.api.strategy.zip.ZipArchiverStrategy;
-import org.mule.extension.compression.api.strategy.zip.ZipCompressorStrategy;
-import org.mule.extension.compression.api.strategy.zip.ZipDecompressorStrategy;
 import org.mule.extension.compression.api.strategy.zip.ZipExtractorStrategy;
+import org.mule.extension.compression.internal.error.exception.DecompressionException;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -29,15 +26,12 @@ import com.google.common.collect.ImmutableMap;
 public class Zip64ModeTests extends FunctionalTestCase {
 
   private static final long AMOUNT_OF_BYTES_GREATER_THAN_4GB = 4295709120L;
-  private static final int AMOUNT_OF_BYTES_IN_1GB = 1073741824;
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
 
   private ZipArchiverStrategy archiver = new ZipArchiverStrategy();
   private ZipExtractorStrategy extractor = new ZipExtractorStrategy();
-  private ZipCompressorStrategy compressor = new ZipCompressorStrategy();
-  private ZipDecompressorStrategy decompressor = new ZipDecompressorStrategy();
 
   @Override
   protected String[] getConfigFiles() {
@@ -48,14 +42,12 @@ public class Zip64ModeTests extends FunctionalTestCase {
   protected void doSetUp() throws Exception {
     muleContext.getInjector().inject(archiver);
     muleContext.getInjector().inject(extractor);
-    muleContext.getInjector().inject(compressor);
-    muleContext.getInjector().inject(decompressor);
   }
 
   @Test
   public void archiveInputStreamGreaterThan4GBNotForceZIP64() throws Exception {
 
-    expected.expect(IOException.class);
+    expected.expect(DecompressionException.class);
     expected.expectMessage("Unexpected error occur while trying to compress: data1's size exceeds the limit of 4GByte.");
 
     archiver.setForceZip64(false);
@@ -63,33 +55,20 @@ public class Zip64ModeTests extends FunctionalTestCase {
     Result<InputStream, Void> compress = archiver.archive(testEntries);
 
     InputStream output = compress.getOutput();
-
-    consumeOutputAndReturnSize(output);
+    TypedValue<InputStream> testInput = new TypedValue<>(output, INPUT_STREAM);
+    extractor.extract(testInput);
   }
 
   @Test
-  public void archiveInputStreamGreaterThan4GBForceZIP64() throws IOException, InterruptedException {
+  public void archiveInputStreamGreaterThan4GBForceZIP64() throws IOException {
 
     archiver.setForceZip64(true);
     Map<String, TypedValue<InputStream>> testEntries = getTestEntries();
     Result<InputStream, Void> compress = archiver.archive(testEntries);
 
     InputStream output = compress.getOutput();
-    assertThat(consumeOutputAndReturnSize(output), lessThan(AMOUNT_OF_BYTES_IN_1GB));
-  }
-
-  /**
-   * This method receive an inputStream, consume all bytes and calculate the total amount,
-   * is necessary to get an error for test
-   */
-  private int consumeOutputAndReturnSize(InputStream is) throws IOException {
-
-    int size = 0;
-    while ((is.read()) != -1) {
-      size++;
-    }
-    is.close();
-    return size;
+    TypedValue<InputStream> testInput = new TypedValue<>(output, INPUT_STREAM);
+    extractor.extract(testInput);
   }
 
   private Map<String, TypedValue<InputStream>> getTestEntries() {
