@@ -119,12 +119,7 @@ public class CompressionManager implements Startable, Stoppable {
   private void archive(Map<String, TypedValue<InputStream>> entries, OutputStream out, Boolean forceZip64)
       throws CompressionException {
     try (ZipArchiveOutputStream zip = new ZipArchiveOutputStream(out)) {
-
-      Set<String> strings = entries.keySet();
-      for (String key : strings) {
-        addEntry(zip, key, entries.get(key), transformationService, forceZip64);
-      }
-
+      entries.forEach((name, content) -> addEntry(zip, name, content, transformationService, forceZip64));
     } catch (Exception e) {
       throw new CompressionException(e.getCause());
     }
