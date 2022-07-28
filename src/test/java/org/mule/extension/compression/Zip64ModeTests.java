@@ -9,8 +9,9 @@ package org.mule.extension.compression;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 
 import org.mule.extension.compression.api.strategy.zip.ZipArchiverStrategy;
+import org.mule.extension.compression.api.strategy.zip.ZipCompressorStrategy;
+import org.mule.extension.compression.api.strategy.zip.ZipDecompressorStrategy;
 import org.mule.extension.compression.api.strategy.zip.ZipExtractorStrategy;
-import org.mule.extension.compression.internal.error.exception.DecompressionException;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -30,7 +31,9 @@ public class Zip64ModeTests extends FunctionalTestCase {
   @Rule
   public ExpectedException expected = ExpectedException.none();
 
+  private ZipCompressorStrategy compressor = new ZipCompressorStrategy();
   private ZipArchiverStrategy archiver = new ZipArchiverStrategy();
+  private ZipDecompressorStrategy decompressor = new ZipDecompressorStrategy();
   private ZipExtractorStrategy extractor = new ZipExtractorStrategy();
 
   @Override
@@ -45,17 +48,32 @@ public class Zip64ModeTests extends FunctionalTestCase {
   }
 
   @Test
-  public void archiveInputStreamGreaterThan4GBNotForceZIP64() {
+  public void archiveInputStreamGreaterThan4GBNotForceZIP64MayThrowException() throws IOException {
 
-    expected.expect(DecompressionException.class);
+    expected.expect(IOException.class);
+    expected.expectMessage("Unexpected error occur while trying to compress: data1's size exceeds the limit of 4GByte.");
 
+    archiver.setHandleErrorsCaughtDuringCompression(true);
     archiver.setForceZip64(false);
     Map<String, TypedValue<InputStream>> testEntries = getTestEntries();
     Result<InputStream, Void> compress = archiver.archive(testEntries);
 
     InputStream output = compress.getOutput();
     TypedValue<InputStream> testInput = new TypedValue<>(output, INPUT_STREAM);
-    extractor.extract(testInput);
+    while(output.read() != -1);
+  }
+
+  @Test
+  public void archiveInputStreamGreaterThan4GBNotForceZIP64MayNotThrowException() throws IOException {
+
+    archiver.setHandleErrorsCaughtDuringCompression(false);
+    archiver.setForceZip64(false);
+    Map<String, TypedValue<InputStream>> testEntries = getTestEntries();
+    Result<InputStream, Void> compress = archiver.archive(testEntries);
+
+    InputStream output = compress.getOutput();
+    TypedValue<InputStream> testInput = new TypedValue<>(output, INPUT_STREAM);
+    while(output.read() != -1);
   }
 
   @Test

@@ -6,10 +6,10 @@
  */
 package org.mule.extension.compression.internal;
 
-import static java.lang.System.getProperty;
 import static org.mule.extension.compression.internal.CompressionExtension.ZIP_MEDIA_TYPE;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.core.api.util.FileUtils.copyStreamToFile;
+import static java.lang.System.getProperty;
 
 import org.mule.extension.compression.internal.error.exception.CompressionException;
 import org.mule.extension.compression.internal.zip.TempZipFile;
@@ -30,7 +30,6 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
@@ -67,21 +66,22 @@ public class CompressionManager implements Startable, Stoppable {
     compressionScheduler = null;
   }
 
-  public Result<InputStream, Void> asyncArchive(Map<String, TypedValue<InputStream>> entries, Boolean forceZip64) {
+  public Result<InputStream, Void> asyncArchive(Map<String, TypedValue<InputStream>> entries, Boolean forceZip64,
+                                                boolean handleErrorsCaughtDuringCompression) {
     try {
-      PipedInputStreamWithFinalExceptionCheck inWithException = new PipedInputStreamWithFinalExceptionCheck();
-      PipedOutputStream out = new PipedOutputStream(inWithException);
+      PipedInputStreamWithReadExceptionCheck inPipeWithException = new PipedInputStreamWithReadExceptionCheck();
+      PipedOutputStream out = new PipedOutputStream(inPipeWithException);
 
       compressionScheduler.submit(() -> {
         try {
           archive(entries, out, forceZip64);
         } catch (CompressionException e) {
-          inWithException.fail(new IOException(e.getMessage()));
+          manageException(handleErrorsCaughtDuringCompression, inPipeWithException, e);
         }
       });
 
       return Result.<InputStream, Void>builder()
-          .output(inWithException)
+          .output(inPipeWithException)
           .mediaType(ZIP_MEDIA_TYPE)
           .build();
     } catch (CompressionException e) {
@@ -161,7 +161,15 @@ public class CompressionManager implements Startable, Stoppable {
     }
   }
 
-  private static final class PipedInputStreamWithFinalExceptionCheck extends PipedInputStream {
+  private void manageException(boolean handleErrorsCaughtDuringCompression,
+                               PipedInputStreamWithReadExceptionCheck inWithException, CompressionException e) {
+    if (handleErrorsCaughtDuringCompression) {
+      inWithException.fail(new IOException(e.getMessage()));
+    }
+    throw e;
+  }
+
+  private static final class PipedInputStreamWithReadExceptionCheck extends PipedInputStream {
 
     private final AtomicReference<IOException> exception = new AtomicReference<>(null);
 

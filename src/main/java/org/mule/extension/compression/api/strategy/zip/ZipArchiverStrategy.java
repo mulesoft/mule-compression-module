@@ -7,6 +7,7 @@
 package org.mule.extension.compression.api.strategy.zip;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
 
 import org.mule.extension.compression.api.strategy.ArchiverStrategy;
 import org.mule.extension.compression.internal.CompressionManager;
@@ -16,6 +17,7 @@ import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.InputStream;
@@ -44,12 +46,19 @@ public class ZipArchiverStrategy implements ArchiverStrategy {
   @Expression(NOT_SUPPORTED)
   boolean forceZip64;
 
+  @Parameter
+  @DisplayName("Handle Errors Caught During Archiving")
+  @Placement(tab = ADVANCED_TAB)
+  @Optional(defaultValue = "false")
+  @Expression(NOT_SUPPORTED)
+  boolean handleErrorsCaughtDuringCompression;
+
   /**
    * {@inheritDoc}
    */
   @Override
   public Result<InputStream, Void> archive(Map<String, TypedValue<InputStream>> entries) {
-    return compressionManager.asyncArchive(entries, forceZip64);
+    return compressionManager.asyncArchive(entries, forceZip64, handleErrorsCaughtDuringCompression);
   }
 
   public boolean isForceZip64() {
@@ -58,5 +67,13 @@ public class ZipArchiverStrategy implements ArchiverStrategy {
 
   public void setForceZip64(boolean forceZip64) {
     this.forceZip64 = forceZip64;
+  }
+
+  public boolean isHandleErrorsCaughtDuringCompression() {
+    return handleErrorsCaughtDuringCompression;
+  }
+
+  public void setHandleErrorsCaughtDuringCompression(boolean handleErrorsCaughtDuringCompression) {
+    this.handleErrorsCaughtDuringCompression = handleErrorsCaughtDuringCompression;
   }
 }
