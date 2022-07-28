@@ -49,21 +49,20 @@ public class ZipCompressorStrategy implements CompressorStrategy {
 
 
   /**
-   * Enables you to throw exceptions handled during de compression.
+   * If this flag is enabled, the module will ignore exceptions produced during the compression
    */
   @Parameter
-  @DisplayName("Handle Errors Caught During Compression")
-  @Placement(tab = ADVANCED_TAB)
-  @Optional(defaultValue = "false")
+  @DisplayName("Ignore errors when compressing")
+  @Optional(defaultValue = "true")
   @Expression(NOT_SUPPORTED)
-  boolean handleErrorsCaughtDuringCompression;
+  boolean ignoreErrorsWhenCompressing;
 
   /**
    * {@inheritDoc}
    */
   @Override
   public Result<InputStream, Void> compress(TypedValue<InputStream> data) throws CompressionException {
-    return compressionManager.asyncArchive(singletonMap("data", data), forceZip64, handleErrorsCaughtDuringCompression);
+    return compressionManager.asyncArchive(singletonMap("data", data), forceZip64, ignoreErrorsWhenCompressing);
   }
 
   public boolean isForceZip64() {
@@ -74,11 +73,11 @@ public class ZipCompressorStrategy implements CompressorStrategy {
     this.forceZip64 = forceZip64;
   }
 
-  public boolean isHandleErrorsCaughtDuringCompression() {
-    return handleErrorsCaughtDuringCompression;
+  public boolean isIgnoreErrorsWhenCompressing() {
+    return ignoreErrorsWhenCompressing;
   }
 
-  public void setHandleErrorsCaughtDuringCompression(boolean handleErrorsCaughtDuringCompression) {
-    this.handleErrorsCaughtDuringCompression = handleErrorsCaughtDuringCompression;
+  public void setIgnoreErrorsWhenCompressing(boolean ignoreErrorsWhenCompressing) {
+    this.ignoreErrorsWhenCompressing = ignoreErrorsWhenCompressing;
   }
 }

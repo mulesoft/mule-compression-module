@@ -67,7 +67,7 @@ public class CompressionManager implements Startable, Stoppable {
   }
 
   public Result<InputStream, Void> asyncArchive(Map<String, TypedValue<InputStream>> entries, Boolean forceZip64,
-                                                boolean handleErrorsCaughtDuringCompression) {
+                                                boolean ignoreErrorsWhenCompressing) {
     try {
       PipedInputStreamWithReadExceptionCheck inPipeWithException = new PipedInputStreamWithReadExceptionCheck();
       PipedOutputStream out = new PipedOutputStream(inPipeWithException);
@@ -76,7 +76,7 @@ public class CompressionManager implements Startable, Stoppable {
         try {
           archive(entries, out, forceZip64);
         } catch (CompressionException e) {
-          manageException(handleErrorsCaughtDuringCompression, inPipeWithException, e);
+          manageException(ignoreErrorsWhenCompressing, inPipeWithException, e);
         }
       });
 
@@ -161,13 +161,14 @@ public class CompressionManager implements Startable, Stoppable {
     }
   }
 
-  private void manageException(boolean handleErrorsCaughtDuringCompression,
+  private void manageException(boolean ignoreErrorsWhenCompressing,
                                PipedInputStreamWithReadExceptionCheck inWithException, CompressionException e) {
-    if (handleErrorsCaughtDuringCompression) {
-      inWithException.fail(new IOException(e.getMessage()));
+    if (ignoreErrorsWhenCompressing) {
+      throw e;
     }
-    throw e;
+    inWithException.fail(new IOException(e));
   }
+
 
   private static final class PipedInputStreamWithReadExceptionCheck extends PipedInputStream {
 
