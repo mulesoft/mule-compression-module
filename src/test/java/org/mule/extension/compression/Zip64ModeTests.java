@@ -68,20 +68,18 @@ public class Zip64ModeTests extends FunctionalTestCase {
     Result<InputStream, Void> compress = archiver.archive(testEntries);
 
     InputStream output = compress.getOutput();
-    TypedValue<InputStream> testInput = new TypedValue<>(output, INPUT_STREAM);
     while (output.read() != -1);
   }
 
   @Test
-  public void archiveInputStreamGreaterThan4GBForceZIP64() {
+  public void archiveInputStreamGreaterThan4GBForceZIP64() throws IOException {
 
     archiver.setForceZip64(true);
     Map<String, TypedValue<InputStream>> testEntries = getTestEntries();
     Result<InputStream, Void> compress = archiver.archive(testEntries);
 
     InputStream output = compress.getOutput();
-    TypedValue<InputStream> testInput = new TypedValue<>(output, INPUT_STREAM);
-    extractor.extract(testInput);
+    while (output.read() != -1);
   }
 
   private Map<String, TypedValue<InputStream>> getTestEntries() {
