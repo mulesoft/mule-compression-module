@@ -9,8 +9,6 @@ package org.mule.extension.compression;
 import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 
 import org.mule.extension.compression.api.strategy.zip.ZipArchiverStrategy;
-import org.mule.extension.compression.api.strategy.zip.ZipCompressorStrategy;
-import org.mule.extension.compression.api.strategy.zip.ZipDecompressorStrategy;
 import org.mule.extension.compression.api.strategy.zip.ZipExtractorStrategy;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -51,7 +49,7 @@ public class Zip64ModeTests extends FunctionalTestCase {
     expected.expect(IOException.class);
     expected.expectMessage("Unexpected error occur while trying to compress: data1's size exceeds the limit of 4GByte.");
 
-    archiver.setIgnoreErrorsWhenCompressing(false);
+    archiver.setIgnoreErrorsWhenArchiving(false);
     archiver.setForceZip64(false);
     Map<String, TypedValue<InputStream>> testEntries = getTestEntries();
     Result<InputStream, Void> compress = archiver.archive(testEntries);
@@ -64,7 +62,7 @@ public class Zip64ModeTests extends FunctionalTestCase {
   @Test
   public void archiveInputStreamGreaterThan4GBNotForceZIP64MayNotThrowException() throws IOException {
 
-    archiver.setIgnoreErrorsWhenCompressing(true);
+    archiver.setIgnoreErrorsWhenArchiving(true);
     archiver.setForceZip64(false);
     Map<String, TypedValue<InputStream>> testEntries = getTestEntries();
     Result<InputStream, Void> compress = archiver.archive(testEntries);
