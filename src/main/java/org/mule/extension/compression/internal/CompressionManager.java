@@ -136,6 +136,7 @@ public class CompressionManager implements Startable, Stoppable {
         zip.setUseZip64(Zip64Mode.Always);
       }
       zip.putArchiveEntry(newEntry);
+
       byte[] buffer = new byte[1024];
       int length;
       InputStream content = getContent(name, entryContent, transformationService);
