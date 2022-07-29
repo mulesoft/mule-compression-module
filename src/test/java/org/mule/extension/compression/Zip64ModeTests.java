@@ -49,6 +49,7 @@ public class Zip64ModeTests extends FunctionalTestCase {
   public void archiveInputStreamGreaterThan4GBNotForceZIP64MayThrowException() throws IOException {
 
     expected.expect(IOException.class);
+    expected.expectMessage("Unexpected error occur while trying to compress: data1's size exceeds the limit of 4GByte.");
 
     archiver.setIgnoreErrorsWhenCompressing(false);
     archiver.setForceZip64(false);
@@ -57,6 +58,7 @@ public class Zip64ModeTests extends FunctionalTestCase {
 
     InputStream output = compress.getOutput();
     while (output.read() != -1);
+    output.read();
   }
 
   @Test
