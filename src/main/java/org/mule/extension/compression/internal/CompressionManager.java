@@ -66,8 +66,7 @@ public class CompressionManager implements Startable, Stoppable {
     compressionScheduler = null;
   }
 
-  public Result<InputStream, Void> asyncArchive(Map<String, TypedValue<InputStream>> entries, Boolean forceZip64,
-                                                boolean ignoreErrorsWhenCompressing) {
+  public Result<InputStream, Void> asyncArchive(Map<String, TypedValue<InputStream>> entries, Boolean forceZip64) {
     try {
       PipedInputStreamWithReadExceptionCheck inPipeWithException = new PipedInputStreamWithReadExceptionCheck();
       PipedOutputStream out = new PipedOutputStream(inPipeWithException);
@@ -76,7 +75,7 @@ public class CompressionManager implements Startable, Stoppable {
         try {
           archive(entries, out, forceZip64);
         } catch (CompressionException e) {
-          manageException(ignoreErrorsWhenCompressing, inPipeWithException, e);
+          inPipeWithException.fail(e);
         }
       });
 
@@ -162,23 +161,14 @@ public class CompressionManager implements Startable, Stoppable {
     }
   }
 
-  private void manageException(boolean ignoreErrorsWhenCompressing,
-                               PipedInputStreamWithReadExceptionCheck inWithException, CompressionException e) {
-    if (ignoreErrorsWhenCompressing) {
-      throw e;
-    }
-    inWithException.fail(new IOException(e));
-  }
-
-
   private static final class PipedInputStreamWithReadExceptionCheck extends PipedInputStream {
 
-    private final AtomicReference<IOException> exception = new AtomicReference<>(null);
+    private final AtomicReference<CompressionException> exception = new AtomicReference<>(null);
 
     @Override
     public int read(byte[] b) throws IOException {
       if (exception.get() != null) {
-        throw exception.get();
+        throw new RuntimeException(exception.get());
       }
       return super.read(b);
     }
@@ -186,7 +176,7 @@ public class CompressionManager implements Startable, Stoppable {
     @Override
     public synchronized int read() throws IOException {
       if (exception.get() != null) {
-        throw exception.get();
+        throw new RuntimeException(exception.get());
       }
       return super.read();
     }
@@ -194,12 +184,12 @@ public class CompressionManager implements Startable, Stoppable {
     @Override
     public synchronized int read(byte[] b, int off, int len) throws IOException {
       if (exception.get() != null) {
-        throw exception.get();
+        throw new RuntimeException(exception.get());
       }
       return super.read(b, off, len);
     }
 
-    public void fail(final IOException e) {
+    public void fail(final CompressionException e) {
       exception.set(e);
     }
   }

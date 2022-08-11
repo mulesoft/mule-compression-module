@@ -45,20 +45,11 @@ public class ZipArchiverStrategy implements ArchiverStrategy {
   boolean forceZip64;
 
   /**
-   * If this flag is enabled, the module will ignore exceptions produced during the compression
-   */
-  @Parameter
-  @DisplayName("Ignore errors when archiving")
-  @Optional(defaultValue = "true")
-  @Expression(NOT_SUPPORTED)
-  boolean ignoreErrorsWhenArchiving;
-
-  /**
    * {@inheritDoc}
    */
   @Override
   public Result<InputStream, Void> archive(Map<String, TypedValue<InputStream>> entries) {
-    return compressionManager.asyncArchive(entries, forceZip64, ignoreErrorsWhenArchiving);
+    return compressionManager.asyncArchive(entries, forceZip64);
   }
 
   public boolean isForceZip64() {
@@ -67,13 +58,5 @@ public class ZipArchiverStrategy implements ArchiverStrategy {
 
   public void setForceZip64(boolean forceZip64) {
     this.forceZip64 = forceZip64;
-  }
-
-  public boolean isIgnoreErrorsWhenArchiving() {
-    return ignoreErrorsWhenArchiving;
-  }
-
-  public void setIgnoreErrorsWhenArchiving(boolean ignoreErrorsWhenArchiving) {
-    this.ignoreErrorsWhenArchiving = ignoreErrorsWhenArchiving;
   }
 }
