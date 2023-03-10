@@ -1,1 +1,1 @@
-runtimeBuild()
+connectorsEntryPoint('library')
