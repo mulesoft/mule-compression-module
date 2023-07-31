@@ -7,11 +7,16 @@
 package org.mule.extension.compression;
 
 import static java.lang.Thread.currentThread;
+import static org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException.Feature.ENCRYPTION;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalToIgnoringWhiteSpace;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mule.extension.compression.CompressionModuleTestUtils.asTextTypedValue;
 import static org.mule.extension.compression.CompressionModuleTestUtils.DATA_SIZE;
 import static org.mule.extension.compression.CompressionModuleTestUtils.FILE_TXT_DATA;
@@ -21,10 +26,13 @@ import static org.mule.runtime.api.metadata.DataType.INPUT_STREAM;
 import static org.mule.runtime.api.metadata.DataType.TEXT_STRING;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 
+import org.apache.commons.compress.archivers.zip.UnsupportedZipFeatureException;
 import org.mule.extension.compression.api.strategy.zip.ZipArchiverStrategy;
 import org.mule.extension.compression.api.strategy.zip.ZipCompressorStrategy;
 import org.mule.extension.compression.api.strategy.zip.ZipDecompressorStrategy;
 import org.mule.extension.compression.api.strategy.zip.ZipExtractorStrategy;
+import org.mule.extension.compression.internal.CompressionManager;
+import org.mule.extension.compression.internal.error.exception.DecompressionException;
 import org.mule.extension.compression.internal.error.exception.InvalidArchiveException;
 import org.mule.extension.compression.internal.error.exception.TooManyEntriesException;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -33,20 +41,25 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.zip.ZipException;
 
 import com.google.common.collect.ImmutableMap;
 import org.hamcrest.collection.IsMapContaining;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class ZipStrategyTestCase extends FunctionalTestCase {
 
   private static final String ZIP_TEST_SINGLE_ENTRY_ARCHIVE_NAME = "file.txt.zip";
   private static final String ZIP_TEST_ARCHIVE_NAME = "archive.zip";
-
+  private static final String INVALID_ARCHIVE_NAME = "invalid_archive.zip";
+  private static final String NOT_EXISTING_ARCHIVE_NAME = "not_existing_archive.zip";
+  private static final String VALID_ARCHIVE_NAME = "valid_archive.zip";
   private static final String FILE_CONTENT_INSIDE_DIR = "This is the content of a file inside a directory in a zip";
 
   @Rule
@@ -107,6 +120,59 @@ public class ZipStrategyTestCase extends FunctionalTestCase {
 
     InputStream testInput = currentThread().getContextClassLoader().getResourceAsStream(ZIP_TEST_ARCHIVE_NAME);
     decompressor.decompress(new TypedValue<>(testInput, TEXT_STRING));
+  }
+
+  @Test
+  public void decompressNoEntries() {
+    expected.expect(InvalidArchiveException.class);
+    expected.expectMessage("The provided archive has no entries");
+
+    InputStream testInput = currentThread().getContextClassLoader().getResourceAsStream(INVALID_ARCHIVE_NAME);
+    decompressor.decompress(new TypedValue<>(testInput, TEXT_STRING));
+  }
+
+  @Test
+  public void decompressIOExceptionWithZipExceptionCause() throws IOException {
+    CompressionManager compressionManager = mock(CompressionManager.class);
+    doThrow(new IOException(new UnsupportedZipFeatureException(ENCRYPTION))).when(compressionManager).toTempZip(any());
+    ReflectionTestUtils.setField(decompressor, "compressionManager", compressionManager);
+
+    InputStream testInput = currentThread().getContextClassLoader().getResourceAsStream(VALID_ARCHIVE_NAME);
+    try {
+      decompressor.decompress(new TypedValue<>(testInput, TEXT_STRING));
+    } catch (Exception e) {
+      assertThat(e, is(instanceOf(InvalidArchiveException.class)));
+      assertThat(e.getCause(), is(instanceOf(ZipException.class)));
+    }
+  }
+
+  @Test
+  public void decompressIOExceptionWithOtherCause() throws IOException {
+    CompressionManager compressionManager = mock(CompressionManager.class);
+    doThrow(new IOException(new Exception())).when(compressionManager).toTempZip(any());
+    ReflectionTestUtils.setField(decompressor, "compressionManager", compressionManager);
+
+    InputStream testInput = currentThread().getContextClassLoader().getResourceAsStream(NOT_EXISTING_ARCHIVE_NAME);
+    try {
+      decompressor.decompress(new TypedValue<>(testInput, TEXT_STRING));
+    } catch (Exception e) {
+      assertThat(e, is(instanceOf(DecompressionException.class)));
+      assertThat(e.getCause(), is(instanceOf(IOException.class)));
+    }
+  }
+
+  @Test
+  public void decompressException() throws IOException {
+    CompressionManager compressionManager = mock(CompressionManager.class);
+    doThrow(new RuntimeException()).when(compressionManager).toTempZip(any());
+    ReflectionTestUtils.setField(decompressor, "compressionManager", compressionManager);
+
+    InputStream testInput = currentThread().getContextClassLoader().getResourceAsStream(VALID_ARCHIVE_NAME);
+    try {
+      decompressor.decompress(new TypedValue<>(testInput, TEXT_STRING));
+    } catch (Exception e) {
+      assertThat(e, is(instanceOf(DecompressionException.class)));
+    }
   }
 
   @Test
