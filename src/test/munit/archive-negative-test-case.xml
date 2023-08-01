@@ -1,0 +1,21 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:compression="http://www.mulesoft.org/schema/mule/compression"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+      http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd">
+
+    <munit:config name="archive-negative.xml"/>
+
+    <munit:test name="null-entries-archive" expectedErrorType="COMPRESSION:COULD_NOT_COMPRESS">
+        <munit:execution>
+            <compression:archive>
+                <compression:entries><![CDATA[#[null]]]></compression:entries>
+                <compression:archiver>
+                    <compression:zip-archiver/>
+                </compression:archiver>
+            </compression:archive>
+        </munit:execution>
+    </munit:test>
+</mule>
