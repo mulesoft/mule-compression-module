@@ -60,7 +60,7 @@ public class ArchivingOperations {
    * be introspected to create dirs inside the archive.
    *
    * @param entries the entries to be added to the archive
-   * @oaram archiver the archiving strategy
+   * @param archiver the archiving strategy
    */
   @MediaType(value = ANY, strict = false)
   @Summary("Compresses a set of entries into a new file in the specified archive format")

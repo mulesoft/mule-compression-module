@@ -43,7 +43,7 @@ public class Zip64ModeTests extends FunctionalTestCase {
     muleContext.getInjector().inject(extractor);
   }
 
-  @Test
+  @Test(timeout = 120000)
   public void archiveInputStreamGreaterThan4GBNotForceZIP64() throws IOException {
 
     expected.expect(RuntimeException.class);
@@ -58,7 +58,7 @@ public class Zip64ModeTests extends FunctionalTestCase {
     output.read();
   }
 
-  @Test
+  @Test(timeout = 120000)
   public void archiveInputStreamGreaterThan4GBForceZIP64() throws IOException {
 
     archiver.setForceZip64(true);
