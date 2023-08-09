@@ -48,7 +48,7 @@
             </compression:decompress>
         </munit:execution>
         <munit:validation>
-                <munit-tools:assert-that  expression="#[payload]" is="#[MunitTools::equalTo( readUrl('classpath://file.txt', 'text/plain') replace '\r' with(''))]"/>
+            <munit-tools:assert-that  expression="#[payload]" is="#[MunitTools::equalTo( readUrl('classpath://file.txt', 'text/plain') replace '\r' with(''))]"/>
         </munit:validation>
     </munit:test>
 
@@ -94,7 +94,7 @@
                 ]
                 </compression:entries>
                 <compression:archiver>
-                    <compression:zip-archiver/>
+                    <compression:zip-archiver forceZip64="true"/>
                 </compression:archiver>
             </compression:archive>
             <file:write config-ref="tmp-dir" path="twoEntry.zip"/>
@@ -183,7 +183,4 @@
             <munit-tools:assert-that expression="#[output text/plain --- payload.data]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain'))]"/>
         </munit:validation>
     </munit:test>
-
-
-
 </mule>

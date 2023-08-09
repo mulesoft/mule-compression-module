@@ -67,10 +67,10 @@ public class CompressionManager implements Startable, Stoppable {
   }
 
   public Result<InputStream, Void> asyncArchive(Map<String, TypedValue<InputStream>> entries, Boolean forceZip64) {
-    try {
+    try (
       PipedInputStreamWithReadExceptionCheck inPipeWithException = new PipedInputStreamWithReadExceptionCheck();
-      PipedOutputStream out = new PipedOutputStream(inPipeWithException);
-
+      PipedOutputStream out = new PipedOutputStream(inPipeWithException)
+    ) {
       compressionScheduler.submit(() -> {
         try {
           archive(entries, out, forceZip64);
@@ -83,9 +83,7 @@ public class CompressionManager implements Startable, Stoppable {
           .output(inPipeWithException)
           .mediaType(ZIP_MEDIA_TYPE)
           .build();
-    } catch (CompressionException e) {
-      throw e;
-    } catch (Throwable t) {
+    } catch (Exception t) {
       throw new CompressionException(t);
     }
   }
