@@ -13,7 +13,7 @@
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-compression-module</artifactId>
     <packaging>mule-extension</packaging>
-    <version>2.2.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
 
     <name>Compression Module</name>
     <description>A Mule module that provides functionality for managing compressed files</description>
@@ -42,7 +42,7 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
                 <configuration>
-                    <destFile>${session.executionRootDirectory}/target/jacoco-java.exec</destFile>
+                    <destFile>${session.executionRootDirectory}/target/jacoco-junit.exec</destFile>
                 </configuration>
                 <executions>
                     <execution>
