@@ -27,12 +27,7 @@
         <mavenResourcesVersion>3.3.1</mavenResourcesVersion>
         <commons.compress.version>1.23.0</commons.compress.version>
         <javax.jaxb-api.version>2.3.1</javax.jaxb-api.version>
-        <allure.junit.version>2.23.0</allure.junit.version>
         <jacoco.version>0.8.10</jacoco.version>
-        <mule.version>4.2.1</mule.version>
-        <mule.api.version>1.2.1</mule.api.version>
-        <mule.sdk.version>1.2.1</mule.sdk.version>
-        <mule.weave.version>2.2.1</mule.weave.version>
 
         <mulesoftLicenseVersion>1.4.0</mulesoftLicenseVersion>
         <license.maven.plugin.version>4.2</license.maven.plugin.version>
