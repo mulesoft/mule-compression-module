@@ -1,9 +1,9 @@
 #!/bin/bash
 RUNTIME_VERSION=4.4.0-20230522
-MUNIT_JVM=$(/usr/libexec/java_home -v 11.0.20)/bin/java
+MUNIT_JVM=$(/usr/libexec/java_home -v 11)/bin/java
 
 # shellcheck disable=SC2155
-export JAVA_HOME=$(/usr/libexec/java_home -v 11.0.20)
+export JAVA_HOME=$(/usr/libexec/java_home -v 11)
 mvn clean
 mkdir target
 mvn verify \
