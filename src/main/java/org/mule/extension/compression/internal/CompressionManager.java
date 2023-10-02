@@ -87,7 +87,8 @@ public class CompressionManager implements Startable, Stoppable {
       throw e;
     } catch (Throwable t) {
       throw new CompressionException(t);
-    }  }
+    }
+  }
 
   /**
    * Receives a ZIP content and creates a temporal physical {@link TempZipFile file} for it
