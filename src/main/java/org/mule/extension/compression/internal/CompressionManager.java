@@ -83,10 +83,11 @@ public class CompressionManager implements Startable, Stoppable {
           .output(inPipeWithException)
           .mediaType(ZIP_MEDIA_TYPE)
           .build();
-    } catch (Exception t) {
+    } catch (CompressionException e) {
+      throw e;
+    } catch (Throwable t) {
       throw new CompressionException(t);
-    }
-  }
+    }  }
 
   /**
    * Receives a ZIP content and creates a temporal physical {@link TempZipFile file} for it
