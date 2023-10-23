@@ -1,0 +1,17 @@
+product: mule
+component: compression
+asset: module
+componentType: library
+
+version: 0.1
+builder:
+  name: java-maven-lib
+  version: 8
+
+deployment:
+  strategy: development
+  channel: ms-connectivity-unified-pipeline
+
+notifications:
+  slackChannel: ms-connectivity-unified-pipeline
+
