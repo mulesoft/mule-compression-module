@@ -34,7 +34,7 @@ import org.mule.sdk.api.annotation.JavaVersionSupport;
  *
  * @since 1.0
  */
-@JavaVersionSupport({JAVA_8, JAVA_11,JAVA_17})
+@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
 @SubTypeMapping(baseType = CompressorStrategy.class, subTypes = {GzipCompressorStrategy.class, ZipCompressorStrategy.class})
 @SubTypeMapping(baseType = DecompressorStrategy.class, subTypes = {GzipDecompressorStrategy.class, ZipDecompressorStrategy.class})
 @SubTypeMapping(baseType = ExtractorStrategy.class, subTypes = {ZipExtractorStrategy.class})
