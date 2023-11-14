@@ -48,7 +48,7 @@
             </compression:decompress>
         </munit:execution>
         <munit:validation>
-                <munit-tools:assert-that  expression="#[payload]" is="#[MunitTools::equalTo( readUrl('classpath://file.txt', 'text/plain') replace '\r' with(''))]"/>
+            <munit-tools:assert-that  expression="#[payload]" is="#[MunitTools::equalTo( readUrl('classpath://file.txt', 'text/plain') replace '\r' with(''))]"/>
         </munit:validation>
     </munit:test>
 
@@ -78,7 +78,7 @@
         </munit:validation>
     </munit:test>
 
-    <munit:test name="archive">
+    <munit:test name="archive_with_forcing_zip64">
         <munit:behavior >
             <file:read config-ref="test-resources" path="file.txt" target="entry1" outputMimeType="text/plain"/>
             <file:read config-ref="test-resources" path="file.txt" target="entry2" outputMimeType="text/plain"/>
@@ -94,7 +94,7 @@
                 ]
                 </compression:entries>
                 <compression:archiver>
-                    <compression:zip-archiver/>
+                    <compression:zip-archiver forceZip64="true"/>
                 </compression:archiver>
             </compression:archive>
             <file:write config-ref="tmp-dir" path="twoEntry.zip"/>
@@ -109,6 +109,44 @@
                         import * from dw::test::Asserts
                         ---
                         (vars.fileTxtSize * 2) must beGreaterThan(vars.compressedFileSize)
+                    ]
+                </munit-tools:that>
+            </munit-tools:assert>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::withMediaType('application/zip')]"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="archive">
+        <munit:behavior >
+            <file:read config-ref="test-resources" path="file.txt" target="entry1" outputMimeType="text/plain"/>
+            <file:read config-ref="test-resources" path="file.txt" target="entry2" outputMimeType="text/plain"/>
+        </munit:behavior>
+        <munit:execution>
+            <compression:archive>
+                <compression:entries>
+                    #[
+                    {
+                    'txt': vars.entry1,
+                    'dir/txt': vars.entry2
+                    }
+                    ]
+                </compression:entries>
+                <compression:archiver>
+                    <compression:zip-archiver/>
+                </compression:archiver>
+            </compression:archive>
+            <file:write config-ref="tmp-dir" path="twoEntry.zip"/>
+            <file:read config-ref="tmp-dir" path="twoEntry.zip"/>
+            <set-variable variableName="compressedFileSize" value="#[attributes.size]"/>
+        </munit:execution>
+        <munit:validation>
+            <file:read config-ref="test-resources" path="file.txt" target="fileTxtSize" targetValue="#[attributes.size]"/>
+            <munit-tools:assert>
+                <munit-tools:that>
+                    #[
+                    import * from dw::test::Asserts
+                    ---
+                    (vars.fileTxtSize * 2) must beGreaterThan(vars.compressedFileSize)
                     ]
                 </munit-tools:that>
             </munit-tools:assert>
@@ -183,7 +221,4 @@
             <munit-tools:assert-that expression="#[output text/plain --- payload.data]" is="#[MunitTools::equalTo(readUrl('classpath://file.txt', 'text/plain'))]"/>
         </munit:validation>
     </munit:test>
-
-
-
 </mule>

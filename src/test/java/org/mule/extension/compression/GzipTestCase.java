@@ -7,11 +7,11 @@
 package org.mule.extension.compression;
 
 import static java.lang.Thread.currentThread;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringWhiteSpace;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertThat;
 import static org.mule.extension.compression.CompressionModuleTestUtils.DATA_SIZE;
 import static org.mule.extension.compression.CompressionModuleTestUtils.FILE_TXT_DATA;
 import static org.mule.extension.compression.CompressionModuleTestUtils.FILE_TXT_NAME;

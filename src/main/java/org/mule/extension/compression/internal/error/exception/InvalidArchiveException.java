@@ -23,10 +23,6 @@ public class InvalidArchiveException extends DecompressionException {
     super("The provided archive is not valid - " + cause.getMessage(), INVALID_ARCHIVE, cause);
   }
 
-  public InvalidArchiveException() {
-    super("The provided archive is not valid", INVALID_ARCHIVE);
-  }
-
   public InvalidArchiveException(String message) {
     super(message, INVALID_ARCHIVE);
   }

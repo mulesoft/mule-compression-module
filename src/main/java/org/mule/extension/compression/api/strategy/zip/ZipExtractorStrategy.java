@@ -16,9 +16,7 @@ import org.mule.extension.compression.internal.zip.TempZipFile;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.exception.ModuleException;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -28,6 +26,7 @@ import java.util.zip.ZipException;
 import javax.inject.Inject;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.mule.runtime.extension.api.exception.ModuleException;
 
 /**
  * A Zip extractor.
@@ -67,16 +66,13 @@ public class ZipExtractorStrategy implements ExtractorStrategy {
     } catch (ModuleException e) {
       closeQuietly(zip);
       throw e;
-    } catch (IOException e) {
+    } catch (Exception e) {
       closeQuietly(zip);
       if (e.getCause() instanceof ZipException) {
         throw new InvalidArchiveException(e.getCause());
       } else {
         throw new DecompressionException(e);
       }
-    } catch (Exception e) {
-      closeQuietly(zip);
-      throw new DecompressionException(e);
     }
   }
 
