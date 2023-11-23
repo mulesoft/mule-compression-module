@@ -56,4 +56,8 @@ public class ZipCompressorStrategy implements CompressorStrategy {
   public boolean isForceZip64() {
     return forceZip64;
   }
+
+  public void setForceZip64(boolean forceZip64) {
+    this.forceZip64 = forceZip64;
+  }
 }
