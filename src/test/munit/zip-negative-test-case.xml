@@ -60,4 +60,89 @@
             </compression:decompress>
         </munit:execution>
     </munit:test>
+
+    <munit:test name="extract-no-entries-zip" expectedErrorType="COMPRESSION:INVALID_ARCHIVE">
+        <munit:behavior>
+            <file:read config-ref="test-resources" path="noEntries.zip" target="archive"/>
+        </munit:behavior>
+        <munit:execution>
+            <compression:extract>
+                <compression:compressed>#[vars.archive]</compression:compressed>
+                <compression:extractor>
+                    <compression:zip-extractor/>
+                </compression:extractor>
+            </compression:extract>
+        </munit:execution>
+    </munit:test>
+
+    <munit:test name="null-gzip-to-compress" expectedErrorType="COMPRESSION:COULD_NOT_COMPRESS">
+        <munit:execution>
+            <compression:compress>
+                <compression:content>#[vars.noExists]</compression:content>
+                <compression:compressor>
+                    <compression:gzip-compressor/>
+                </compression:compressor>
+            </compression:compress>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:fail message="EXAMPLE MESSAGE"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="decompress-no-entries-zip" expectedErrorType="COMPRESSION:INVALID_ARCHIVE">
+        <munit:behavior>
+            <file:read config-ref="test-resources" path="noEntries.zip"/>
+        </munit:behavior>
+        <munit:execution>
+            <compression:decompress>
+                <compression:decompressor>
+                    <compression:zip-decompressor/>
+                </compression:decompressor>
+            </compression:decompress>
+        </munit:execution>
+    </munit:test>
+
+    <munit:test name="null-entries-archive" expectedErrorType="COMPRESSION:COULD_NOT_COMPRESS">
+        <munit:execution>
+            <compression:archive>
+                <compression:entries><![CDATA[#[null]]]></compression:entries>
+                <compression:archiver>
+                    <compression:zip-archiver/>
+                </compression:archiver>
+            </compression:archive>
+        </munit:execution>
+    </munit:test>
+
+    <munit:test name="null-zip-to-decompress" expectedErrorType="COMPRESSION:INVALID_ARCHIVE">
+        <munit:execution>
+            <compression:decompress>
+                <compression:compressed>#[vars.noExists]</compression:compressed>
+                <compression:decompressor>
+                    <compression:zip-decompressor/>
+                </compression:decompressor>
+            </compression:decompress>
+        </munit:execution>
+    </munit:test>
+
+    <munit:test name="invalid-zip-to-decompress" expectedErrorType="COMPRESSION:INVALID_ARCHIVE">
+        <munit:execution>
+            <compression:decompress>
+                <compression:compressed>#['INVALID_CONTENT']</compression:compressed>
+                <compression:decompressor>
+                    <compression:zip-decompressor/>
+                </compression:decompressor>
+            </compression:decompress>
+        </munit:execution>
+    </munit:test>
+
+    <munit:test name="invalid-gzip-to-decompress" expectedErrorType="COMPRESSION:INVALID_ARCHIVE">
+        <munit:execution>
+            <compression:decompress>
+                <compression:compressed>#['INVALID_CONTENT']</compression:compressed>
+                <compression:decompressor>
+                    <compression:gzip-decompressor/>
+                </compression:decompressor>
+            </compression:decompress>
+        </munit:execution>
+    </munit:test>
 </mule>
