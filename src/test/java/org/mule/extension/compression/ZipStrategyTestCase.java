@@ -7,11 +7,11 @@
 package org.mule.extension.compression;
 
 import static java.lang.Thread.currentThread;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalToIgnoringWhiteSpace;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertThat;
 import static org.mule.extension.compression.CompressionModuleTestUtils.asTextTypedValue;
 import static org.mule.extension.compression.CompressionModuleTestUtils.DATA_SIZE;
 import static org.mule.extension.compression.CompressionModuleTestUtils.FILE_TXT_DATA;
@@ -46,16 +46,15 @@ public class ZipStrategyTestCase extends FunctionalTestCase {
 
   private static final String ZIP_TEST_SINGLE_ENTRY_ARCHIVE_NAME = "file.txt.zip";
   private static final String ZIP_TEST_ARCHIVE_NAME = "archive.zip";
-
   private static final String FILE_CONTENT_INSIDE_DIR = "This is the content of a file inside a directory in a zip";
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
 
-  private ZipCompressorStrategy compressor = new ZipCompressorStrategy();
-  private ZipArchiverStrategy archiver = new ZipArchiverStrategy();
-  private ZipDecompressorStrategy decompressor = new ZipDecompressorStrategy();
-  private ZipExtractorStrategy extractor = new ZipExtractorStrategy();
+  private final ZipCompressorStrategy compressor = new ZipCompressorStrategy();
+  private final ZipArchiverStrategy archiver = new ZipArchiverStrategy();
+  private final ZipDecompressorStrategy decompressor = new ZipDecompressorStrategy();
+  private final ZipExtractorStrategy extractor = new ZipExtractorStrategy();
 
   @Override
   protected String[] getConfigFiles() {
