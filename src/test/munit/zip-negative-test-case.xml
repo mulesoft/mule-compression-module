@@ -135,7 +135,7 @@
         </munit:execution>
     </munit:test>
 
-    <munit:test name="invalid-gzip-to-decompress" expectedErrorType="COMPRESSION:INVALID_ARCHIVE">
+    <munit:test name="invalid-zip-gzip-to-decompress" expectedErrorType="COMPRESSION:INVALID_ARCHIVE">
         <munit:execution>
             <compression:decompress>
                 <compression:compressed>#['INVALID_CONTENT']</compression:compressed>
