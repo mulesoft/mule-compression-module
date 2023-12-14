@@ -75,7 +75,7 @@
         </munit:execution>
     </munit:test>
 
-    <munit:test name="null-gzip-to-compress" expectedErrorType="COMPRESSION:COULD_NOT_COMPRESS">
+    <munit:test name="null-zip-gzip-to-compress" expectedErrorType="COMPRESSION:COULD_NOT_COMPRESS">
         <munit:execution>
             <compression:compress>
                 <compression:content>#[vars.noExists]</compression:content>
