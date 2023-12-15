@@ -20,7 +20,7 @@
 
     <properties>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
-        <file.connector.version>1.5.2-Q4TESTING-W-14148523-SNAPSHOT</file.connector.version>
+        <file.connector.version>1.5.2</file.connector.version>
         <munit.input.directory>src/test/munit</munit.input.directory>
         <munit.output.directory>${basedir}/target/test-mule/munit</munit.output.directory>
         <mavenResourcesVersion>3.3.1</mavenResourcesVersion>
