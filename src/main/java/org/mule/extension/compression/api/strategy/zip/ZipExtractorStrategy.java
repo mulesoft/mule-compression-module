@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -16,7 +16,6 @@ import org.mule.extension.compression.internal.zip.TempZipFile;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.exception.ModuleException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +27,7 @@ import java.util.zip.ZipException;
 import javax.inject.Inject;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.mule.runtime.extension.api.exception.ModuleException;
 
 /**
  * A Zip extractor.

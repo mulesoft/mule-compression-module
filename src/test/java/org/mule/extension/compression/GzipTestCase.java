@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -7,11 +7,11 @@
 package org.mule.extension.compression;
 
 import static java.lang.Thread.currentThread;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringWhiteSpace;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertThat;
 import static org.mule.extension.compression.CompressionModuleTestUtils.DATA_SIZE;
 import static org.mule.extension.compression.CompressionModuleTestUtils.FILE_TXT_DATA;
 import static org.mule.extension.compression.CompressionModuleTestUtils.FILE_TXT_NAME;
