@@ -40,6 +40,7 @@
         <jacoco.version>0.8.10</jacoco.version>
         <munit.version>3.1.0-rc4</munit.version>
         <mule-sdk-api.version>0.7.0</mule-sdk-api.version>
+        <type>extension</type>
     </properties>
 
     <build>
