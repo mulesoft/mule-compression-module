@@ -28,7 +28,8 @@
         <mavenResourcesVersion>3.0.2</mavenResourcesVersion>
         <commons.compress.version>1.20</commons.compress.version>
         <commons.lang3.version>3.10</commons.lang3.version>
-        <javax.jaxb-api.version>2.3.1</javax.jaxb-api.version>
+        <javax.jaxb-api.version>2.3.1</javax.jaxb-api.version
+        <mtf.javaopts></mtf.javaopts>
     </properties>
 
     <build>
@@ -71,6 +72,11 @@
                             <includeSnapshots>true</includeSnapshots>
                         </discoverRuntimes>
                     </runtimeConfiguration>
+                    <environmentVariables>
+                        <!-- Toggles the JDK17 style flag -->
+                        <!-- ugly hack -->
+                        <_JAVA_OPTIONS>-XX:+PrintCommandLineFlags ${mtf.javaopts}</_JAVA_OPTIONS>
+                    </environmentVariables>
                 </configuration>
                 <executions>
                     <execution>
