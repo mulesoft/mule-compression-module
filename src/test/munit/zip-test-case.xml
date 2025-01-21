@@ -52,6 +52,22 @@
         </munit:validation>
     </munit:test>
 
+    <munit:test name="decompress-zip-with-latin-1-data">
+        <munit:behavior>
+            <file:read config-ref="test-resources" path="üü.zip"/>
+        </munit:behavior>
+        <munit:execution>
+            <compression:decompress outputMimeType="text/plain" outputEncoding="ISO-8859-1">
+                <compression:decompressor>
+                    <compression:zip-decompressor/>
+                </compression:decompressor>
+            </compression:decompress>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that  expression="#[payload]" is="#[MunitTools::withEncoding('ISO-8859-1')]"/>
+        </munit:validation>
+    </munit:test>
+
     <munit:test name="bigContentRoundtrip">
         <munit:behavior>
             <set-variable variableName="payloadSize" value="#[output application/java --- 100 * 1024 * 1024]" />
