@@ -2,8 +2,8 @@ projectType: extension
 additionalTestConfigs:
   jdk11:
     testJdkTool: OPEN-JDK11
-    mavenAdditionalArgs: -Dtest=none -DfailIfNoTests=false -DruntimeVersion=4.8.5 -DminVersion=4.3.0
+    mavenAdditionalArgs: -Dtest=none -DfailIfNoTests=false -DruntimeVersion=4.8.5 
+    #TODO replace -DruntimeVersion=4.8.5 with -DminVersion=4.3.0 when a solution is provided by Munit.
   jdk17:
     testJdkTool: OPEN-JDK17
-    mavenAdditionalArgs: -Dtest=none -DfailIfNoTests=false -DminVersion=4.6.0 -DruntimeProduct=MULE_EE -DruntimeVersion=4.9.4
-
+    mavenAdditionalArgs: -Dtest=none -DfailIfNoTests=false -DminVersion=4.6.0 -DruntimeProduct=MULE_EE
